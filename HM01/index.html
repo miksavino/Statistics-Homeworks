@@ -1,1 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Homework 1: Private Key → Public Key in Ethereum</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                width: 100%;
+                min-height: 100vh;
+                background-color: var(--bg-light-blue);
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 1040px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            header p.subtitle {
+                margin: 0;
+                color: var(--text-secondary);
+                font-size: 1.05rem;
+                font-weight: 500;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            .card-content p:last-child {
+                margin-bottom: 0;
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+            .sim-layout {
+                display: grid;
+                grid-template-columns: 420px 1fr;
+                gap: 24px;
+                align-items: start;
+                margin-top: 18px;
+            }
+
+            @media (max-width: 960px) {
+                .sim-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .canvas-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            canvas {
+                background-color: #050b18;
+                border: 2px solid #1e293b;
+                border-radius: 8px;
+                width: 100%;
+                max-width: 420px;
+                aspect-ratio: 1 / 1;
+            }
+
+            .details-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .calc-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr auto auto;
+                gap: 10px;
+                align-items: flex-end;
+            }
+
+            @media (max-width: 620px) {
+                .calc-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .control-group label {
+                font-weight: 600;
+                font-size: 0.88rem;
+                color: var(--title);
+            }
+
+            select, input[type="number"] {
+                padding: 8px 10px;
+                font-size: 0.92rem;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                background-color: var(--code-bg);
+                color: var(--text);
+                outline: none;
+                height: 38px;
+            }
+
+            select:focus, input[type="number"]:focus {
+                border-color: var(--button-primary);
+            }
+
+            button {
+                padding: 8px 14px;
+                font-size: 0.92rem;
+                font-weight: 700;
+                border-radius: 6px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+                height: 38px;
+            }
+
+            button:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            button.btn-primary {
+                background-color: var(--button-primary);
+                color: #ffffff;
+            }
+
+            button.btn-primary:hover:not(:disabled) {
+                background-color: var(--other-buttons);
+            }
+
+            button.btn-secondary {
+                background-color: #e2e8f0;
+                color: var(--text);
+            }
+
+            button.btn-secondary:hover:not(:disabled) {
+                background-color: #cbd5e1;
+            }
+
+            .result-summary {
+                background-color: #f0fdf4;
+                border: 1px solid #86efac;
+                color: #14532d;
+                padding: 10px 14px;
+                border-radius: 6px;
+                font-size: 0.95rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .result-summary strong {
+                font-size: 1.1rem;
+                color: #166534;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                max-height: 290px;
+                overflow-y: auto;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.85rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: var(--title);
+                padding: 8px 10px;
+                border-bottom: 2px solid var(--card-border);
+                font-weight: 700;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #edf2f7;
+                color: var(--text);
+            }
+
+            tr:last-child td {
+                border-bottom: none;
+            }
+
+            tr:nth-child(even) {
+                background-color: #fafcff;
+            }
+
+            .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .chart-panel-full {
+                background-color: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 8px;
+                padding: 16px 20px;
+                margin-bottom: 12px;
+            }
+
+            .histogram {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                height: 120px;
+                border-bottom: 2px solid var(--title);
+                padding: 0 4px;
+                gap: 4px;
+            }
+
+            .hist-col {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                height: 100%;
+                justify-content: flex-end;
+            }
+
+            .hist-count {
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--text-secondary);
+                margin-bottom: 2px;
+            }
+
+            .hist-bar {
+                width: 100%;
+                max-width: 20px;
+                border-radius: 3px 3px 0 0;
+            }
+
+            .bar-x { background-color: var(--button-primary); }
+            .bar-y { background-color: #10b981; }
+
+            .h-0 { height: 2px; background-color: #cbd5e1; }
+            .h-1 { height: 45px; }
+            .h-2 { height: 90px; }
+
+            .hist-axis {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 4px;
+                gap: 4px;
+                margin-top: 6px;
+            }
+
+            .hist-tick {
+                flex: 1;
+                text-align: center;
+                font-size: 0.72rem;
+                font-family: monospace;
+                color: var(--text-secondary);
+                font-weight: 600;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="main-container">
+
+            <header>
+                <h1>Homework 1: Private Key → Public Key in Ethereum</h1>
+                <p class="subtitle">Toy Curve Simulation: y² ≡ x³ + 7 (mod 17) &bull; Discrete Logarithm One-Way Function</p>
+            </header>
+
+            <section class="card">
+                <h2 class="card-title">1. Introduction: Asymmetric Cryptography & One-Way Trapdoors</h2>
+                <div class="card-content">
+                    <p>
+                        In Ethereum and modern public-key cryptography, a <strong>private key</strong> is fundamentally an integer scalar <code>k</code> chosen uniformly at random. From this secret scalar, the associated <strong>public key</strong> <code>Q</code> is computed via elliptic-curve scalar point multiplication:
+                    </p>
+                    <p style="text-align: center; font-size: 1.15rem; font-weight: 700; color: var(--title); margin: 16px 0;">
+                        Q = k * G = G + G + ... + G (k times)
+                    </p>
+                    <p>
+                        , where <code>G</code> is a generator point on the curve. 
+                    </p>
+                    <p>
+                        To explore these group operations, this homework models the relationship using the <strong>toy curve</strong> <code>y² ≡ x³ + 7 (mod 17)</code>.
+                    </p>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">2. Interactive Simulation</h2>
+                <div class="card-content">
+                    <p>
+                        Choose a generator point <code>G</code> and a private key scalar <code>k</code>.
+                    </p>
+
+                    <div class="sim-layout">
+                        <div class="canvas-box">
+                            <canvas id="hw1Canvas" width="420" height="420"></canvas>
+                        </div>
+
+                        <div class="details-panel">
+                            <div class="calc-grid">
+                                <div class="control-group">
+                                    <label for="selectG">Base Point G:</label>
+                                    <select id="selectG"></select>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="inputK">Private Key k:</label>
+                                    <input type="number" id="inputK" value="6" min="1" max="18">
+                                </div>
+
+                                <button id="btnCompute" class="btn-primary">Simulate</button>
+                                <button id="btnClear" class="btn-secondary">Reset</button>
+                            </div>
+
+                            <div id="resultBanner" class="result-summary">
+                                <span>Toy Public Key: </span><strong id="pubKeyOutput">-</strong>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 55px;">Step</th>
+                                            <th style="width: 95px;">Operation</th>
+                                            <th style="width: 95px;">Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Statistical Exploration</h2>
+                <div class="card-content">
+                    <p style="margin-bottom: 16px;">In this section, the public key <code>Q = kG</code> was computed using the base point <code>G = (1, 5)</code> and all possible private key values <code>k ∈ [1, 17]</code>, excluding the point at infinity. The statistical analysis of the resulting points follows below.</p>
+                    
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Frequency of x values</h3>
+                        <div class="chart-panel-full">
+                            <div class="histogram">
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-x h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                            </div>
+                            <div class="hist-axis">
+                                <span class="hist-tick">0</span><span class="hist-tick">1</span><span class="hist-tick">2</span><span class="hist-tick">3</span>
+                                <span class="hist-tick">4</span><span class="hist-tick">5</span><span class="hist-tick">6</span><span class="hist-tick">7</span>
+                                <span class="hist-tick">8</span><span class="hist-tick">9</span><span class="hist-tick">10</span><span class="hist-tick">11</span>
+                                <span class="hist-tick">12</span><span class="hist-tick">13</span><span class="hist-tick">14</span><span class="hist-tick">15</span>
+                                <span class="hist-tick">16</span>
+                            </div>
+                        </div>
+                        <p class="stat-text">
+                            <strong>Non-uniform distribution:</strong> 8 values never appear as an x-coordinate. The value <code>x = 3</code> occurs exactly once (yielding <code>y = 0</code>), while 8 values appear exactly twice due to vertical symmetry across the elliptic curve: each valid x generates both <code>(x, y)</code> and <code>(x, 17 - y)</code>.
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Frequency of y values</h3>
+                        <div class="chart-panel-full">
+                            <div class="histogram">
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                            </div>
+                            <div class="hist-axis">
+                                <span class="hist-tick">0</span><span class="hist-tick">1</span><span class="hist-tick">2</span><span class="hist-tick">3</span>
+                                <span class="hist-tick">4</span><span class="hist-tick">5</span><span class="hist-tick">6</span><span class="hist-tick">7</span>
+                                <span class="hist-tick">8</span><span class="hist-tick">9</span><span class="hist-tick">10</span><span class="hist-tick">11</span>
+                                <span class="hist-tick">12</span><span class="hist-tick">13</span><span class="hist-tick">14</span><span class="hist-tick">15</span>
+                                <span class="hist-tick">16</span>
+                            </div>
+                        </div>
+                        <p class="stat-text">
+                            <strong>Uniform distribution:</strong> every possible value appears as an ordinate exactly once. This ensures that for every choice of y, there exists a unique matching x such that <code>x³ ≡ y² - 7 (mod 17)</code>.
+                        </p>
+                    </div>  
+                    
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Distribution of Bits</h3>
+                        
+                        <div class="chart-panel-full">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.88rem; text-align: center;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid var(--card-border); background-color: #f8fafc;">
+                                        <th style="padding: 8px; text-align: left;">Coordinate</th>
+                                        <th style="padding: 8px;">b₀</th>
+                                        <th style="padding: 8px;">b₁</th>
+                                        <th style="padding: 8px;">b₂</th>
+                                        <th style="padding: 8px;">b₃</th>
+                                        <th style="padding: 8px;">b₄</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #edf2f7;">
+                                        <td style="padding: 8px; text-align: left; font-weight: 700; color: var(--button-primary);">x coordinate</td>
+                                        <td style="padding: 8px;">9 / 17 (52.9%)</td>
+                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
+                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
+                                        <td style="padding: 8px; font-weight: 700; color: #b91c1c;">12 / 17 (70.6%)</td>
+                                        <td style="padding: 8px; font-weight: 700; color: #b91c1c;">0 / 17 (0.0%)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; text-align: left; font-weight: 700; color: #10b981;">y coordinate</td>
+                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
+                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
+                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
+                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
+                                        <td style="padding: 8px; font-weight: 700; color: #b91c1c;">1 / 17 (5.9%)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Apparent Uniformity and Correlation between Input and Output</h3>
+                        <p class="stat-text">
+                            As <code>k</code> increases b1, consecutive coordinate pairs do not follow a continuous or monotonic trajectory. The coordinates appear to bounce unpredictably across the modular grid, creating an impression of uniform dispersion across the plane. However, the sequence is completely constrained since the generated points never occupy arbitrary positions; they only visit the 17 solutions satisfying the equation <code>y² ≡ x³ + 7 (mod 17)</code>.
+                        </p>
+                        <p class="stat-text" style="margin-top: 10px;">
+                            Furthermore, there is no obvious correlation between the private key <code>k</code> and the public key <code>Q</code>. However, the input and the outpur are still connected by a simple rule: knowing <code>Q = kG</code> determines <code>(k + 1)G = Q + G</code>, meaning that the points are constrained by the geometry of the toy curve rather than being picked at random.                   
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Avalanche-like Behaviour</h3>
+                        <p class="stat-text">
+                            As seen in the previous analysis, the group addition rule is preserved. Hence, there is no real avalanche effect since the scalar multiplication does not destroy the algebraic structure of the toy curve, unlike what a cryptographic hash function would do. However, by changing only 1 bit in the private key <code>k</code>, the output point can still flip more than 50% of its coordinate bits. 
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Note on Varying the Base Point G</h3>
+                        <p class="stat-text">
+                            No experiments were conducted with alternative base points <code>G</code>.
+                        </p>
+                        <p class="stat-text">
+                            Since <code>G = (1, 5)</code> generates the entire group, iterating <code>k</code> from 1 to 17 visits all 17 points of the curve. Selecting a different valid generatore <code>G'</code> would only change the sequence in which the points are visited, while the set of generated points remains the same.
+                        </p>
+                        <p class="stat-text"> Hence, all analyzed properties remains unchanged.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Cryptographic implications</h2>
+                <div class="card-content">
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Meaningful for a OWF</h3>
+                        <p class="stat-text">
+                            This operation behaves as a <strong>cryptographic one-way function</strong> (<strong>OWF</strong>):
+                        </p>
+                        <ul>
+                            <li><strong>Forward direction (computationally efficient):</strong> Computing <code>Q = k * G</code> can be solved in polynomial time using scalar multiplication algorithms.</li>
+                            <li><strong>Reverse direction (computationally infeasible):</strong> Recovering the private key <code>k</code> given only the public point <code>Q</code> and generator <code>G</code> requires solving the <strong>Elliptic Curve Discrete Logarithm Problem (ECDLP)</strong>, for which no polynomial-time classical algorithm is known.</li>
+                        </ul>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Meaningful for a hash function</h3>
+                        <p class="stat-text">
+                            Despite the lack of an obvious linear correlation between the input and the output, and despite exhibiting a behaviour similar to an avalanche effect, elliptic curve scalar multiplication does not destroy the underlying algebraic structure.
+                        </p>
+                        <p class="stat-text">Furthermore, the output is not statistically independent or uniform: both the coordinate values and individual bits display clear biases.</p>
+                        <p class="stat-text">Hence, while the scattering of points across the plane might give an initial impression of pseudorandomness, the process remains strictly deterministic and algebraically constrained.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <script>
+            const p = 17;
+            const a = 0; 
+            const b = 7; 
+
+            const canvas = document.getElementById('hw1Canvas');
+            const ctx = canvas.getContext('2d');
+            const selectG = document.getElementById('selectG');
+            const inputK = document.getElementById('inputK');
+            const btnCompute = document.getElementById('btnCompute');
+            const btnClear = document.getElementById('btnClear');
+            const pubKeyOutput = document.getElementById('pubKeyOutput');
+            const historyTableBody = document.getElementById('historyTableBody');
+       
+            function mod(n, m) {
+                return ((n % m) + m) % m;
+            }
+
+            function modInverse(val, m) {
+                val = mod(val, m);
+                for (let x = 1; x < m; x++) {
+                    if (mod(val * x, m) === 1) {
+                        return x;
+                    }
+                }
+                return null;
+            }
+
+            function getCurvePoints() {
+                const points = [];
+                for (let x = 0; x < p; x++) {
+                    const rhs = mod(x * x * x + b, p);
+                    for (let y = 0; y < p; y++) {
+                        if (mod(y * y, p) === rhs) {
+                            points.push({ x, y });
+                        }
+                    }
+                }
+                return points; 
+            }
+
+            const validPoints = getCurvePoints();
+            validPoints.forEach(pt => {
+                const opt = document.createElement('option');
+                opt.value = `${pt.x},${pt.y}`;
+                opt.textContent = `(${pt.x}, ${pt.y})`;
+                if (pt.x === 1 && pt.y === 5) {
+                    opt.selected = true;
+                }
+                selectG.appendChild(opt);
+            });
+            
+            function pointAdd(P, Q) {
+                if (!P) return { point: Q };
+                if (!Q) return { point: P };
+
+                if (P.x === Q.x && mod(P.y + Q.y, p) === 0) {
+                    return { point: null };
+                }
+
+                let lambda; 
+                if (P.x === Q.x && P.y === Q.y) {
+                    if (P.y === 0) return { point: null };
+                    const num = mod(3 * P.x * P.x + a, p);
+                    const den = mod(2 * P.y, p);
+                    const denInv = modInverse(den, p);
+                    lambda = mod(num * denInv, p);
+                } else {
+                    const num = mod(Q.y - P.y, p);
+                    const den = mod(Q.x - P.x, p);
+                    const denInv = modInverse(den, p);
+                    lambda = mod(num * denInv, p);
+                }
+
+                const rx = mod(lambda * lambda - P.x - Q.x, p);
+                const ry = mod(lambda * (P.x - rx) - P.y, p);
+                return { point: { x: rx, y: ry } };
+            }
+
+            const pad = 36;
+            function toCanvas(pt) {
+                const step = (canvas.width - 2 * pad) / (p - 1);
+                return {
+                    cx: pad + pt.x * step,
+                    cy: canvas.height - (pad + pt.y * step)
+                };
+            }
+
+            let persistentLines = [];
+            let labeledPoints = [];
+            let isRunning = false;
+            const colorsPalette = ['#38bdf8', '#f43f5e', '#fbbf24', '#34d399', '#a855f7', '#fb923c', '#ec4899', '#22d3ee', '#818cf8', '#facc15'];
+            
+            function drawScene() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const step = (canvas.width - 2 * pad) / (p - 1);
+                
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < p; i++) {
+                    const pos = pad + i * step;
+                    ctx.beginPath();
+                    ctx.moveTo(pos, pad);
+                    ctx.lineTo(pos, canvas.height - pad);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(pad, pos);
+                    ctx.lineTo(canvas.width - pad, pos);
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+                for (let i = 0; i < p; i++) {
+                    const pos = pad + i * step;
+                    ctx.fillText(i, pos - (i >= 10 ? 7 : 3), canvas.height - pad + 18);
+                    const yVal = p - 1 - i;
+                    ctx.fillText(yVal, pad - (yVal >= 10 ? 24 : 18), pad + i * step + 4);
+                }
+                
+                persistentLines.forEach(line => {
+                    const p1 = toCanvas(line.from);
+                    const p2 = toCanvas(line.to);
+                    ctx.beginPath();
+                    ctx.moveTo(p1.cx, p1.cy);
+                    ctx.lineTo(p2.cx, p2.cy);
+                    ctx.strokeStyle = line.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                });
+
+                validPoints.forEach(pt => {
+                    const c = toCanvas(pt);
+                    ctx.beginPath();
+                    ctx.arc(c.cx, c.cy, 4.5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#64748b';
+                    ctx.fill();
+                });
+
+                labeledPoints.forEach(lp => {
+                    const c = toCanvas(lp.pt);
+
+                    ctx.beginPath();
+                    ctx.arc(c.cx, c.cy, 6.5, 0, 2 * Math.PI);
+                    ctx.fillStyle = lp.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 11px system-ui, sans-serif';
+                    const textWidth = ctx.measureText(lp.label).width;
+                    ctx.fillStyle = 'rgba(5, 11, 24, 0.85)';
+                    ctx.fillRect(c.cx + 7, c.cy - 14, textWidth + 6, 15);
+
+                    ctx.fillStyle = lp.color;
+                    ctx.fillText(lp.label, c.cx + 10, c.cy - 2);
+                });
+            }
+
+            async function runStepByStep() {
+                if (isRunning) return;
+                isRunning = true;
+                btnCompute.disabled = true;
+                btnClear.disabled = true;
+
+                const [gx, gy] = selectG.value.split(',').map(Number);
+                const G = { x: gx, y: gy };
+                const k = parseInt(inputK.value);
+
+                historyTableBody.innerHTML = '';
+                persistentLines = [];
+                labeledPoints = [];
+                pubKeyOutput.textContent = 'Computing...';
+
+                let current = G;
+                labeledPoints.push({
+                    pt: G,
+                    label: '1G',
+                    color: colorsPalette[0]
+                });
+
+                historyTableBody.innerHTML += `
+                    <tr>
+                        <td><strong>1G</strong></td>
+                        <td>Generator Point G</td>
+                        <td><strong>(${G.x}, ${G.y})</strong></td>
+                    </tr>
+                `;
+
+                drawScene();
+
+                for (let step = 2; step <= k; step++) {
+                    await new Promise(resolve => setTimeout(resolve, 700));
+
+                    const res = pointAdd(current, G);
+                    const lineColor = colorsPalette[(step - 1) % colorsPalette.length];
+
+                    if (current && res.point) {
+                        persistentLines.push({
+                            from: current,
+                            to: res.point,
+                            color: lineColor
+                        });
+
+                        labeledPoints.push({
+                            pt: res.point,
+                            label: `${step}G`,
+                            color: lineColor
+                        });
+                    }
+
+                    if (!res.point) {
+                        historyTableBody.innerHTML += `
+                            <tr style="background-color: #fef2f2;">
+                                <td><strong>${step}G</strong></td>
+                                <td>${step - 1}G + G</td>
+                                <td style="color: #b91c1c; font-weight: bold;">Point at Infinity</td>
+                            </tr>
+                        `;
+                        current = null;
+                        drawScene();
+                        break;
+                    } else {
+                        historyTableBody.innerHTML += `
+                            <tr>
+                                <td><strong>${step}G</strong></td>
+                                <td>${step - 1}G + G</td>
+                                <td><strong>(${res.point.x}, ${res.point.y})</strong></td>
+                            </tr>
+                        `;
+                        current = res.point;
+                        drawScene();
+                    }
+
+                    const tableWrapper = document.querySelector('.table-wrapper');
+                    tableWrapper.scrollTop = tableWrapper.scrollHeight;
+                }
+
+                pubKeyOutput.textContent = current ? `(${current.x}, ${current.y})` : "Point at Infinity";
+                isRunning = false;
+                btnCompute.disabled = false;
+                btnClear.disabled = false;
+            }
+
+            btnCompute.addEventListener('click', runStepByStep);
+            btnClear.addEventListener('click', () => {
+                if (isRunning) return;
+                persistentLines = [];
+                labeledPoints = [];
+                historyTableBody.innerHTML = '';
+                pubKeyOutput.textContent = '-';
+                drawScene();
+            });
+
+            drawScene();
+        </script> 
+    </body>
+</html>
