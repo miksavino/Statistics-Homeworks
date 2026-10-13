@@ -337,8 +337,17 @@
             .bar-y { background-color: #10b981; }
 
             .h-0 { height: 2px; background-color: #cbd5e1; }
-            .h-1 { height: 45px; }
-            .h-2 { height: 90px; }
+            .h-9  { height: 28px; }
+            .h-12 { height: 36px; }
+            .h-16 { height: 48px; }
+            .h-24 { height: 72px; }
+            .h-32 { height: 96px; }
+            
+            .h-y-6  { height: 38px; }
+            .h-y-8  { height: 50px; }
+            .h-y-9  { height: 56px; }
+            .h-y-12 { height: 75px; }
+            .h-y-16 { height: 100px; }
 
             .hist-axis {
                 display: flex;
@@ -444,28 +453,28 @@
             <section class="card">
                 <h2 class="card-title">Statistical Exploration</h2>
                 <div class="card-content">
-                    <p style="margin-bottom: 16px;">In this section, the public key <code>Q = kG</code> was computed using the base point <code>G = (1, 5)</code> and all possible private key values <code>k ∈ [1, 17]</code>, excluding the point at infinity. The statistical analysis of the resulting points follows below.</p>
+                    <p style="margin-bottom: 16px;">In this section, the public key <code>Q = kG</code> was computed using all possible base points and all possible private key values <code>k ∈ [1, 17]</code>, excluding the point at infinity. The statistical analysis of the resulting points follows below.</p>
                     
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Frequency of x values</h3>
                         <div class="chart-panel-full">
                             <div class="histogram">
                                 <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-x h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">24</span><div class="hist-bar bar-x h-24"></div></div>
+                                <div class="hist-col"><span class="hist-count">24</span><div class="hist-bar bar-x h-24"></div></div>
+                                <div class="hist-col"><span class="hist-count">9</span><div class="hist-bar bar-x h-9"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">32</span><div class="hist-bar bar-x h-32"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-x h-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">16</span><div class="hist-bar bar-x h-16"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-x h-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
+                                <div class="hist-col"><span class="hist-count">24</span><div class="hist-bar bar-x h-24"></div></div>
                                 <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
                                 <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
-                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
-                                <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
-                                <div class="hist-col"><span class="hist-count">2</span><div class="hist-bar bar-x h-2"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-x h-12"></div></div>
                                 <div class="hist-col"><span class="hist-count">0</span><div class="hist-bar bar-x h-0"></div></div>
                             </div>
                             <div class="hist-axis">
@@ -477,7 +486,7 @@
                             </div>
                         </div>
                         <p class="stat-text">
-                            <strong>Non-uniform distribution:</strong> 8 values never appear as an x-coordinate. The value <code>x = 3</code> occurs exactly once (yielding <code>y = 0</code>), while 8 values appear exactly twice due to vertical symmetry across the elliptic curve: each valid x generates both <code>(x, y)</code> and <code>(x, 17 - y)</code>.
+                            <strong>Non-uniform distribution:</strong> 8 values (0, 4, 7, 9, 11, 13, 14, 16) never appear as an x-coordinate (frequency 0). Among the valid values, occurrences are heavily dispersed rather than uniformly distributed, ranging from a minimum of 9 (for <code>x = 3</code>) up to a peak of 32 (for <code>x = 5</code>), showing strong algebraic clustering across the modular field.
                         </p>
                     </div>
 
@@ -485,23 +494,23 @@
                         <h3 class="stat-subtitle">Frequency of y values</h3>
                         <div class="chart-panel-full">
                             <div class="histogram">
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
-                                <div class="hist-col"><span class="hist-count">1</span><div class="hist-bar bar-y h-1"></div></div>
+                                <div class="hist-col"><span class="hist-count">9</span><div class="hist-bar bar-y h-y-9"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-y h-y-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">6</span><div class="hist-bar bar-y h-y-6"></div></div>
+                                <div class="hist-col"><span class="hist-count">8</span><div class="hist-bar bar-y h-y-8"></div></div>
+                                <div class="hist-col"><span class="hist-count">6</span><div class="hist-bar bar-y h-y-6"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-y h-y-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">6</span><div class="hist-bar bar-y h-y-6"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-y h-y-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">16</span><div class="hist-bar bar-y h-y-16"></div></div>
+                                <div class="hist-col"><span class="hist-count">16</span><div class="hist-bar bar-y h-y-16"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-y h-y-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">6</span><div class="hist-bar bar-y h-y-6"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-y h-y-12"></div></div>
+                                <div class="hist-col"><span class="hist-count">6</span><div class="hist-bar bar-y h-y-6"></div></div>
+                                <div class="hist-col"><span class="hist-count">8</span><div class="hist-bar bar-y h-y-8"></div></div>
+                                <div class="hist-col"><span class="hist-count">6</span><div class="hist-bar bar-y h-y-6"></div></div>
+                                <div class="hist-col"><span class="hist-count">12</span><div class="hist-bar bar-y h-y-12"></div></div>
                             </div>
                             <div class="hist-axis">
                                 <span class="hist-tick">0</span><span class="hist-tick">1</span><span class="hist-tick">2</span><span class="hist-tick">3</span>
@@ -512,7 +521,7 @@
                             </div>
                         </div>
                         <p class="stat-text">
-                            <strong>Uniform distribution:</strong> every possible value appears as an ordinate exactly once. This ensures that for every choice of y, there exists a unique matching x such that <code>x³ ≡ y² - 7 (mod 17)</code>.
+                            <strong>Non-uniform distribution with mirror symmetry:</strong> Although every ordinate in the range [0, 16] appears at least once, the distribution is not uniform, fluctuating between 6 and 16 occurrences. Furthermore, it displays strict reflectional symmetry modulo 17: for each coordinate <code>y</code>, the inverted point <code>17 - y</code> shares the exact same frequency (e.g., y = 1 and y = 16 appear 12 times; y = 8 and y = 9 appear 16 times), confirming the algebraic grouping of inverse points across the curve.
                         </p>
                     </div>  
                     
@@ -534,52 +543,44 @@
                                 <tbody>
                                     <tr style="border-bottom: 1px solid #edf2f7;">
                                         <td style="padding: 8px; text-align: left; font-weight: 700; color: var(--button-primary);">x coordinate</td>
-                                        <td style="padding: 8px;">9 / 17 (52.9%)</td>
-                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
-                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
-                                        <td style="padding: 8px; font-weight: 700; color: #b91c1c;">12 / 17 (70.6%)</td>
-                                        <td style="padding: 8px; font-weight: 700; color: #b91c1c;">0 / 17 (0.0%)</td>
+                                        <td style="padding: 8px;">77 / 165 (46.7%)</td>
+                                        <td style="padding: 8px;">69 / 165 (41.8%)</td>
+                                        <td style="padding: 8px;">80 / 165 (48.5%)</td>
+                                        <td style="padding: 8px;">64 / 165 (38.8%)</td>
+                                        <td style="padding: 8px;">0 / 165 (0.0%)</td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px; text-align: left; font-weight: 700; color: #10b981;">y coordinate</td>
-                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
-                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
-                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
-                                        <td style="padding: 8px;">8 / 17 (47.1%)</td>
-                                        <td style="padding: 8px; font-weight: 700; color: #b91c1c;">1 / 17 (5.9%)</td>
+                                        <td style="padding: 8px;">78 / 165 (47.3%)</td>
+                                        <td style="padding: 8px;">64 / 165 (38.8%)</td>
+                                        <td style="padding: 8px;">68 / 165 (41.2%)</td>
+                                        <td style="padding: 8px;">82 / 165 (49.7%)</td>
+                                        <td style="padding: 8px;">12 / 165 (7.3%)</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
+                        <p class="stat-text" style="margin-top: 14px;">
+                            In an ideal cryptographic setting, each bit should have an independent 50% probability of being 1. The data shows clear deviations from this behavior: the lower bits (b0 to b3) fluctuate between 38.8% and 49.7%, while the most significant bit (b4) drops to 0.0% for x and 7.3% for y. This drop occurs because coordinates are bounded by the prime modulus 17, and no valid point on this curve has an x-coordinate of 16. These results show that the bits are correlated by the underlying curve equation rather than being uniformly distributed, which explains why raw curve coordinates must be processed by a hash function before being used as addresses.
+                        </p>
                     </div>
 
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Apparent Uniformity and Correlation between Input and Output</h3>
                         <p class="stat-text">
-                            As <code>k</code> increases b1, consecutive coordinate pairs do not follow a continuous or monotonic trajectory. The coordinates appear to bounce unpredictably across the modular grid, creating an impression of uniform dispersion across the plane. However, the sequence is completely constrained since the generated points never occupy arbitrary positions; they only visit the 17 solutions satisfying the equation <code>y² ≡ x³ + 7 (mod 17)</code>.
+                            As <code>k</code> increases by 1, consecutive coordinate pairs do not follow a continuous or monotonic path. The points seem to jump unpredictably across the modular grid, giving a superficial impression of uniform dispersion. However, this sequence is strictly constrained: the generated points can never take arbitrary positions in the field, as they must satisfy the curve equation <code>y² ≡ x³ + 7 (mod 17)</code> and belong to the cyclic group generated by <code>G</code>.
                         </p>
                         <p class="stat-text" style="margin-top: 10px;">
-                            Furthermore, there is no obvious correlation between the private key <code>k</code> and the public key <code>Q</code>. However, the input and the outpur are still connected by a simple rule: knowing <code>Q = kG</code> determines <code>(k + 1)G = Q + G</code>, meaning that the points are constrained by the geometry of the toy curve rather than being picked at random.                   
+                            In addition, while there is no obvious linear correlation between the scalar <code>k</code> and the resulting point <code>Q</code>, they remain linked by a deterministic algebraic rule: knowing <code>Q = kG</code> directly allows computing <code>(k + 1)G = Q + G</code>. This proves that point multiplication preserves the group law and geometric constraints, rather than producing statistically independent outputs.
                         </p>
                     </div>
 
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Avalanche-like Behaviour</h3>
                         <p class="stat-text">
-                            As seen in the previous analysis, the group addition rule is preserved. Hence, there is no real avalanche effect since the scalar multiplication does not destroy the algebraic structure of the toy curve, unlike what a cryptographic hash function would do. However, by changing only 1 bit in the private key <code>k</code>, the output point can still flip more than 50% of its coordinate bits. 
+                            Because scalar multiplication preserves the group addition law, it does not provide a true cryptographic avalanche effect. Changing a single bit in the private key <code>k</code> can occasionally flip more than 50% of the bits in the resulting coordinates, mimicking avalanche-like behavior. However, this is only a visual artifact of the modular arithmetic: unlike a hash function, the operation never destroys the underlying algebraic relation <code>(k + 1)G = kG + G</code>, leaving the system fully predictable from a group-theory perspective.
                         </p>
-                    </div>
-
-                    <div class="stat-section">
-                        <h3 class="stat-subtitle">Note on Varying the Base Point G</h3>
-                        <p class="stat-text">
-                            No experiments were conducted with alternative base points <code>G</code>.
-                        </p>
-                        <p class="stat-text">
-                            Since <code>G = (1, 5)</code> generates the entire group, iterating <code>k</code> from 1 to 17 visits all 17 points of the curve. Selecting a different valid generatore <code>G'</code> would only change the sequence in which the points are visited, while the set of generated points remains the same.
-                        </p>
-                        <p class="stat-text"> Hence, all analyzed properties remains unchanged.</p>
                     </div>
                 </div>
             </section>
@@ -590,21 +591,36 @@
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Meaningful for a OWF</h3>
                         <p class="stat-text">
-                            This operation behaves as a <strong>cryptographic one-way function</strong> (<strong>OWF</strong>):
+                            Scalar multiplication acts as an asymmetric <strong>cryptographic one-way function (OWF)</strong>:
                         </p>
                         <ul>
-                            <li><strong>Forward direction (computationally efficient):</strong> Computing <code>Q = k * G</code> can be solved in polynomial time using scalar multiplication algorithms.</li>
-                            <li><strong>Reverse direction (computationally infeasible):</strong> Recovering the private key <code>k</code> given only the public point <code>Q</code> and generator <code>G</code> requires solving the <strong>Elliptic Curve Discrete Logarithm Problem (ECDLP)</strong>, for which no polynomial-time classical algorithm is known.</li>
+                            <li>
+                                <strong>Forward direction (computationally efficient):</strong> Computing <code>Q = kG</code> is straightforward and runs in polynomial time.
+                            </li>
+                            <li>
+                                <strong>Reverse direction (computationally infeasible):</strong> Finding the private key <code>k</code> from the public point <code>Q</code> and base point <code>G</code> requires solving the <strong>Elliptic Curve Discrete Logarithm Problem (ECDLP)</strong>. For properly chosen cryptographic curves, no classical polynomial-time algorithm exists to compute this inverse.
+                            </li>
                         </ul>
                     </div>
 
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Meaningful for a hash function</h3>
-                        <p class="stat-text">
-                            Despite the lack of an obvious linear correlation between the input and the output, and despite exhibiting a behaviour similar to an avalanche effect, elliptic curve scalar multiplication does not destroy the underlying algebraic structure.
-                        </p>
-                        <p class="stat-text">Furthermore, the output is not statistically independent or uniform: both the coordinate values and individual bits display clear biases.</p>
-                        <p class="stat-text">Hence, while the scattering of points across the plane might give an initial impression of pseudorandomness, the process remains strictly deterministic and algebraically constrained.</p>
+                       <div class="stat-section">
+                            <p class="stat-text">
+                                Even though multiplying a point does not show an obvious linear pattern and can look random at first glance, it lacks the main properties of a cryptographic hash function:
+                            </p>
+                            <ul>
+                                <li>
+                                    <strong>It keeps mathematical relationships:</strong> Elliptic curve math follows clear addition rules, such as <code>(k + 1)G = kG + G</code>. A true hash function must destroy all algebraic patterns so that outputs cannot be linked or combined mathematically.
+                                </li>
+                                <li>
+                                    <strong>It is not statistically uniform:</strong> The data clearly shows that coordinates and individual bits have visible biases, rather than behaving like balanced random noise where every bit has an even 50% chance.
+                                </li>
+                            </ul>
+                            <p class="stat-text" style="margin-top: 10px;">
+                                In summary, scalar multiplication works great as a one-way function to generate a public key from a private key. However, because its output keeps this geometric structure, Ethereum cannot use the raw point as an address: it must first pass the public key through Keccak-256 to scramble the bits completely and create a uniform 20-byte address.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
