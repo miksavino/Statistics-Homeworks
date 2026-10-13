@@ -141,12 +141,12 @@
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Key Generation vs. Key Derivation</h3>
                         <p class="stat-text">
-                            According to <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt2r1.pdf" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">NIST SP 800-57 Part 2 Rev. 1</a>, <strong>key generation</strong> is defined as <em>"the generation of a cryptographic key either as a single process 
+                             <strong>key generation</strong> is defined as the generation of a cryptographic key either as a single process 
 using a random bit generator and an approved set of rules, or 
-as created during key agreement or key derivation"</em>. As highlighted by <a href="https://www.ibm.com/it-it/think/topics/key-management" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">IBM's Key Management guidelines</a>, key generation represents the first stage of the cryptographic key lifecycle, establishing the security baseline on which all operations rely.   
+as created during key agreement or key derivation. It represents the first stage of the cryptographic key lifecycle, establishing the security baseline on which all operations rely.   
                         </p>
                         <p class="stat-text">
-                            In contrast, according to <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-133r2.pdf" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">NIST SP 800-57 Part 2 Rev. 1</a>, <strong>key derivation</strong> is defined as <em>"a process that derives new keying material from a key that is currently available"</em>.
+                            In contrast, <strong>key derivation</strong> is defined as a process that derives new keying material from a key that is currently available.
                         </p>
                         <p class="stat-text">Hence, while key generation creates the initial root entropy, key derivation structures that entropy into an arbitrary tree of keys without requiring new external randomness.</p>
                     </div>
@@ -161,7 +161,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Hashing</h3>
                         <p class="stat-text">
-                            <strong>Hashing</strong> is the process of converting data - text, numbers, files, or anything - into a fixed.length string of letters and numbers by using an algorithm called <strong>hash function</strong> (<a href="https://www.codecademy.com/resources/blog/what-is-hashing" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">Codecademy - What Is Hashing, and How Does It Work?</a>).
+                            <strong>Hashing</strong> is the process of converting data - text, numbers, files, or anything - into a fixed.length string of letters and numbers by using an algorithm called <strong>hash function</strong>.
                         </p>
                         <p class="stat-text">
                             Hashing and encryption are both ways of transforming data:
@@ -175,7 +175,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Checksums</h3>
                         <p class="stat-text">
-                            According to <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-12r1.pdf" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">NIST SP 800-12 Rev. 1</a>, a <strong>checksum</strong> is <em>"a value that is computed by a function that is dependent on the content of a data object and is stored or transmitted together with the object, for detecting changes in the data"</em>.<br/>
+                            A <strong>checksum</strong> is a value that is computed by a function that is dependent on the content of a data object and is stored or transmitted together with the object, for detecting changes in the data.<br/>
                             In other words, a checksum acts as a digital fingerprint: matching checksums mean the data is intact; mismatched checksums indicate integrity violations.  
                         </p>
                     </div>
@@ -183,7 +183,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Encoding</h3>
                         <p class="stat-text">
-                            According to <a href="https://nhimg.org/glossary/encoding/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">Non-Human Identity Management Group - Encoding</a>, <strong>encoding</strong> is a <em>"reversible way of changing data into another representation, so it can be transported, stored or interpreted by another system."</em>.<br/>
+                            <strong>Encoding</strong> is a reversible way of changing data into another representation, so it can be transported, stored or interpreted by another system..<br/>
                             It is not a protection mechanism, but is about representation: an encoded value may look unreadable, but it is still the original data once decoded.<br/> 
                         </p>
                     </div>
@@ -269,7 +269,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                     <div class="stat-section">
                         <h3 class="stat-subtitle">BIP-39 (Mnemonic Sentence and Seed Generation)</h3>
                         <p class="stat-text">
-                            <strong>BIP-39</strong> is a standard that describes the process of generating mnemonic sentences for the creation of deterministic wallets. It aimes to simplify the process of wallet backup and recovery: by using a mnemonic sentence, users can restore their entire wallet, including all associated private keys, without needing to back up each key individually (<a href="https://tetherwiki.com/wiki/introduction_of_the_bip-39_standard" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">TetherWiki - BIT-39</a>).<br/>
+                            <strong>BIP-39</strong> is a standard that describes the process of generating mnemonic sentences for the creation of deterministic wallets. It aimes to simplify the process of wallet backup and recovery: by using a mnemonic sentence, users can restore their entire wallet, including all associated private keys, without needing to back up each key individually.<br/> 
                             BIP-39 operates by converting a randomly generated number into a sequence of words. This process involves several steps:
                             <ul>
                                 <li>Generates raw random entropy of 128 to 256 bits.</li>
@@ -283,7 +283,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                     <div class="stat-section">
                         <h3 class="stat-subtitle">BIP-32 (Hierarchical Deterministic Key Derivation)</h3>
                         <p class="stat-text">
-                            <strong>BIP-32</strong> introduces hierarchical deterministic wallets, allowing the derivation of a complete tree of keys from a single master binary seed (<a href="https://tetherwiki.com/wiki/bip32_and_bip39" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">TetherWiki - BIT-32 and BIP-39</a>).<br/>
+                            <strong>BIP-32</strong> introduces hierarchical deterministic wallets, allowing the derivation of a complete tree of keys from a single master binary seed. <br/> 
                             The process of generating keys involves the following steps:
                             <ul>
                                 <li>Uses the seed to derive a master private key and a 32-byte master chain code as the tree root.</li>
@@ -308,7 +308,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                             <li><strong>address_index</strong> indicated the account address number. It starts from 0 and it is increased by 1 after creating a new address within the same account.</li>
                         </ul>
                         <p class="stat-text">
-                           Path levels marked with an apostrofo use hardened derivation, requiring the root private key, preventing root key recovery even if a child private key is compromised (<a href="https://satochip.io/bip44/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">SATOCHIP - Bitcoin Improvement Proposal #44 - BIP44</a>).
+                           Path levels marked with an apostrofo use hardened derivation, requiring the root private key, preventing root key recovery even if a child private key is compromised.
                         </p>
                     </div>
 
@@ -317,7 +317,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                         <p class="stat-text">
                             <strong>secp256k1</strong> is the elliptic curve cryptography standard used to generate private keys and create digital signaratures, allowing users to prove fund ownership without revealing their private keys.<br/>
                             The standard transforms a private key into a public key through elliptic curve multiplication: it multiplies the 256-bit private key scalar <code>k</code> by a predefined generator point <code>G</code> on the curve (<code>Q = kG</code>); the result is a 64-byte public key.
-                            <br/>secp256k1 offers strong cryptographic security, efficient computation, relatively small key size, fast verification and low overhead (<a href="https://ecos.am/en/learn/secp256k1" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">ECOS - secp256k1</a>). 
+                            <br/>secp256k1 offers strong cryptographic security, efficient computation, relatively small key size, fast verification and low overhead.
                         </p>
                         <p class="stat-text">
                             The security of the standard relies on the <strong>Elliptic Curve Logarithm Problem</strong>: deriving a public key from a private key is computationally easy; in contrast, deriving a private key from a public key is infeasible.<br/>
@@ -335,7 +335,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                         </p>
                         <ul>
                             <li>During the <strong>absorbing phase</strong>, pads and partitions input data into blocks, XORs them into a 1600-bit internal state and scrambles the state via the <strong>Kekkak-f permutation</strong>.</li>
-                            <li>During the <strong>squeezing phase</strong>, extracts 256 bits from the internal state to produce the final hash (<a href="https://rugdoc.io/wiki/docs/introduction-to-ethereums-keccak-256-algorithm/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">RugDoc - What Is the Kekkak-256 Algorithm? Complete Technical Guide</a>). </li>
+                            <li>During the <strong>squeezing phase</strong>, extracts 256 bits from the internal state to produce the final hash.</li>
                         </ul>
                         <p class="stat-text">In order to generate Ethereum addresses, the function keeps the last 20 bytes of the result.</p>
                     </div>
@@ -347,7 +347,7 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                             It prevents accidental loss of funds due to human typing errors or copy-paste corruptions without altering the 20-byte length address.
                         </p>
                         <p class="stat-text">
-                            For each character in the address, if the corresponding bit in the hash is 1 and the character is a letter, it is capitalized. Otherwise it stays lowercase (<a href="https://cryptools.dev/tools/eip55-checksum/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">Cryptools - EIP-55 Checksum</a>). 
+                            For each character in the address, if the corresponding bit in the hash is 1 and the character is a letter, it is capitalized. Otherwise it stays lowercase.
                         </p>
                     </div>
                 </div>
@@ -477,6 +477,78 @@ as created during key agreement or key derivation"</em>. As highlighted by <a hr
                             <strong>Error Detection vs. Backward Compatibility</strong> &rarr; Rather than altering address length with explicit checksum suffixes, EIP-55 embeds error detection into the casing of hexadecimal letters with zero byte overhead.
                         </li>
                     </ul>
+                </div>
+            </section>
+	
+	<section class="card">
+                <h2 class="card-title">References</h2>
+                <div class="card-content">
+                    <p style="margin-bottom: 18px;">
+                        Standard specifications, governmental guidelines, and technical documentation cited throughout this analysis:
+                    </p>
+
+                    <ol style="padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.93rem; color: var(--text);">
+                        <li>
+                            National Institute of Standards and Technology (NIST). 
+                            <em>Recommendation for Key Management – Part 2: Best Practices for Key Management Organizations</em> (NIST SP 800-57 Part 2 Rev. 1). 
+                            <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt2r1.pdf" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">nvlpubs.nist.gov</a>.
+                        </li>
+                        <li>
+                            National Institute of Standards and Technology (NIST). 
+                            <em>Recommendation for Cryptographic Key Generation</em> (NIST SP 800-133 Rev. 2). 
+                            <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-133r2.pdf" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">nvlpubs.nist.gov</a>.
+                        </li>
+                        <li>
+                            National Institute of Standards and Technology (NIST). 
+                            <em>An Introduction to Information Security</em> (NIST SP 800-12 Rev. 1). 
+                            <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-12r1.pdf" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">nvlpubs.nist.gov</a>.
+                        </li>
+                        <li>
+                            IBM Think. 
+                            <em>Che cos'è la gestione delle chiavi?</em>. 
+                            <a href="https://www.ibm.com/it-it/think/topics/key-management" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">ibm.com</a>.
+                        </li>
+                        <li>
+                            Codecademy. 
+                            <em>What Is Hashing, and How Does It Work?</em>. 
+                            <a href="https://www.codecademy.com/resources/blog/what-is-hashing" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">codecademy.com</a>.
+                        </li>
+                        <li>
+                            Non-Human Identity Management Group (NHIMG). 
+                            <em>Glossary: Encoding</em>. 
+                            <a href="https://nhimg.org/glossary/encoding/" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">nhimg.org</a>.
+                        </li>
+                        <li>
+                            TetherWiki. 
+                            <em>Introduction of the BIP-39 Standard</em>. 
+                            <a href="https://tetherwiki.com/wiki/introduction_of_the_bip-39_standard" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">tetherwiki.com</a>.
+                        </li>
+                        <li>
+                            TetherWiki. 
+                            <em>BIP-32 and BIP-39</em>. 
+                            <a href="https://tetherwiki.com/wiki/bip32_and_bip39" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">tetherwiki.com</a>.
+                        </li>
+                        <li>
+                            Satochip. 
+                            <em>Bitcoin Improvement Proposal #44 - BIP44</em>. 
+                            <a href="https://satochip.io/bip44/" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">satochip.io</a>.
+                        </li>
+                        <li>
+                            ECOS. 
+                            <em>secp256k1 Explained</em>. 
+                            <a href="https://ecos.am/en/learn/secp256k1" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">ecos.am</a>.
+                        </li>
+                        <li>
+                            RugDoc. 
+                            <em>What Is the Keccak-256 Algorithm? Complete Technical Guide</em>. 
+                            <a href="https://rugdoc.io/wiki/docs/introduction-to-ethereums-keccak-256-algorithm/" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">rugdoc.io</a>.
+                        </li>
+                        <li>
+                            Cryptools. 
+                            <em>EIP-55 Checksum Tool and Specification</em>. 
+                            <a href="https://cryptools.dev/tools/eip55-checksum/" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">cryptools.dev</a>.
+                        </li>
+                    </ol>
                 </div>
             </section>
         </div>
