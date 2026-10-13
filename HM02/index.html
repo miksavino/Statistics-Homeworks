@@ -1,1 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Homework 2 - From Wallet Seed to Ethereum Address: Hashing, Key Derivation and Cryptographic Primitives</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 960px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            header p.subtitle {
+                margin: 0;
+                color: var(--text-secondary);
+                font-size: 1.05rem;
+                font-weight: 500;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            .card-content p:last-child {
+                margin-bottom: 0;
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+             .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="main-container">
+            <header>
+                <h1>Homework 2 - From Wallet Seed to Ethereum Address: Hashing, Key Derivation and Cryptographic Primitives</h1>
+            </header>
+
+            <section class="card">
+                <h2 class="card-title">Fundamental Cryptographic Distinctions</h2>
+                <div class="card-content">
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Key Generation vs. Key Derivation</h3>
+                        <p class="stat-text">
+                            According to <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt2r1.pdf" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">NIST SP 800-57 Part 2 Rev. 1</a>, <strong>key generation</strong> is defined as <em>"the generation of a cryptographic key either as a single process 
+using a random bit generator and an approved set of rules, or 
+as created during key agreement or key derivation"</em>. As highlighted by <a href="https://www.ibm.com/it-it/think/topics/key-management" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">IBM's Key Management guidelines</a>, key generation represents the first stage of the cryptographic key lifecycle, establishing the security baseline on which all operations rely.   
+                        </p>
+                        <p class="stat-text">
+                            In contrast, according to <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-133r2.pdf" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">NIST SP 800-57 Part 2 Rev. 1</a>, <strong>key derivation</strong> is defined as <em>"a process that derives new keying material from a key that is currently available"</em>.
+                        </p>
+                        <p class="stat-text">Hence, while key generation creates the initial root entropy, key derivation structures that entropy into an arbitrary tree of keys without requiring new external randomness.</p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Public-Key Cryptography</h3>
+                        <p class="stat-text">
+                            <strong>Public-key cryptography</strong> relies on two separate keys: a <strong>public key</strong>, which can be shared openly, and a <strong>private key</strong>, which must remain secret. <br/> Messages encrypted with the public key can only be decrypted with the corresponding private key, ensuring that only the intended recipient can access the information. Conversely, messages signed with a private key can be verified using the public key, providing authentication and integrity of the sender's identity and message content.
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Hashing</h3>
+                        <p class="stat-text">
+                            <strong>Hashing</strong> is the process of converting data - text, numbers, files, or anything - into a fixed.length string of letters and numbers by using an algorithm called <strong>hash function</strong> (<a href="https://www.codecademy.com/resources/blog/what-is-hashing" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">Codecademy - What Is Hashing, and How Does It Work?</a>).
+                        </p>
+                        <p class="stat-text">
+                            Hashing and encryption are both ways of transforming data:
+                        </p>
+                        <ul>
+                            <li>Hashing is a <strong>one-way process</strong>, meaning that once the data is hashed, it cannot be changed back to its original form.</li>
+                            <li>Encryption is a <strong>two-way process</strong> since encrypted data can be decrypted by someone with the correct key.</li>
+                        </ul>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Checksums</h3>
+                        <p class="stat-text">
+                            According to <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-12r1.pdf" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">NIST SP 800-12 Rev. 1</a>, a <strong>checksum</strong> is <em>"a value that is computed by a function that is dependent on the content of a data object and is stored or transmitted together with the object, for detecting changes in the data"</em>.<br/>
+                            In other words, a checksum acts as a digital fingerprint: matching checksums mean the data is intact; mismatched checksums indicate integrity violations.  
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Encoding</h3>
+                        <p class="stat-text">
+                            According to <a href="https://nhimg.org/glossary/encoding/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">Non-Human Identity Management Group - Encoding</a>, <strong>encoding</strong> is a <em>"reversible way of changing data into another representation, so it can be transported, stored or interpreted by another system."</em>.<br/>
+                            It is not a protection mechanism, but is about representation: an encoded value may look unreadable, but it is still the original data once decoded.<br/> 
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Simplified Ethereum Wallet Pipeline</h2>
+                <div class="card-content">
+                    <p style="margin-bottom: 22px;">
+                        Sequential transformation of state from high-entropy mnemonic to a checksummed address:
+                    </p>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; overflow-x: auto; padding: 12px 4px 16px 4px;">
+
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 130px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">Input</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">Mnemonic</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">12–24 words</div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 90px; flex-shrink: 0;">
+                            <span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; border: 1px solid #bae6fd; margin-bottom: 2px;">BIP-39</span>
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">Root</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">Binary Seed</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">512 bits</div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 110px; flex-shrink: 0;">
+                            <span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.72rem; border: 1px solid #bae6fd; margin-bottom: 2px; text-align: center; white-space: nowrap;">BIP-32 / BIP-44</span>
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">Secret</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">Private Key</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">256-bit scalar <code>k</code></div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 95px; flex-shrink: 0;">
+                            <span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; border: 1px solid #bae6fd; margin-bottom: 2px;">secp256k1</span>
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">Public</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">Public Key</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">64 bytes (<code>X || Y</code>)</div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 95px; flex-shrink: 0;">
+                            <span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; border: 1px solid #bae6fd; margin-bottom: 2px;">Keccak-256</span>
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">Identity</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">Raw Address</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">20 bytes (hex)</div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 80px; flex-shrink: 0;">
+                            <span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.75rem; border: 1px solid #bae6fd; margin-bottom: 2px;">EIP-55</span>
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 140px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: #166534; letter-spacing: 0.05em; margin-bottom: 2px;">Verified Output</div>
+                            <div style="font-weight: 700; color: #14532d; font-size: 0.95rem;">Checksummed</div>
+                            <div style="font-size: 0.78rem; color: #166534;">Mixed-case <code>0x...</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Standards and cryptographic primitives</h2>
+                <div class="card-content">
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">BIP-39 (Mnemonic Sentence and Seed Generation)</h3>
+                        <p class="stat-text">
+                            <strong>BIP-39</strong> is a standard that describes the process of generating mnemonic sentences for the creation of deterministic wallets. It aimes to simplify the process of wallet backup and recovery: by using a mnemonic sentence, users can restore their entire wallet, including all associated private keys, without needing to back up each key individually (<a href="https://tetherwiki.com/wiki/introduction_of_the_bip-39_standard" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">TetherWiki - BIT-39</a>).<br/>
+                            BIP-39 operates by converting a randomly generated number into a sequence of words. This process involves several steps:
+                            <ul>
+                                <li>Generates raw random entropy of 128 to 256 bits.</li>
+                                <li>Computes and appends an entropy-derived checksum to guarantee sentence integrity and detect transcription errors.</li>
+                                <li>Splits the entropy-checksum pyaload into 11-bit segments, each indexing a word from a fixed 2048-words wordlist to form a mnemonic sentence (12 to 24 words).</li>
+                                <li>Applies a key-stretching funtion to convert the sentence into a 512-bit binary seed, eliminating linguistic patterns.</li>
+                            </ul>
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">BIP-32 (Hierarchical Deterministic Key Derivation)</h3>
+                        <p class="stat-text">
+                            <strong>BIP-32</strong> introduces hierarchical deterministic wallets, allowing the derivation of a complete tree of keys from a single master binary seed (<a href="https://tetherwiki.com/wiki/bip32_and_bip39" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">TetherWiki - BIT-32 and BIP-39</a>).<br/>
+                            The process of generating keys involves the following steps:
+                            <ul>
+                                <li>Uses the seed to derive a master private key and a 32-byte master chain code as the tree root.</li>
+                                <li>Applies HMAC-SHA512 to combine the master key, the master chain code and a child index to recursively derive child keys. Each child key can be used to generate further child keys, creating a hierarchical structure.</li>
+                            </ul>
+                            Because HMAC acts as a <strong>PRF</strong>, each child key is computationally indistinguishable from keys sampled independently from a uniform distribution over the scalar field. Hence, without knowledge of the master chain code, observing multiple sibling child keys reveals zero statistical correlation between them.
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">BIP-44 (Standard Derivation Paths for Hierarchical Deterministic Wallets)</h3>
+                        <p class="stat-text">
+                            <strong>BIP-44</strong> extends BIP-32 by defining a standard five-level derivation path to organize multi-account wallets deterministically from a single master seed, meaning that a single wallet can hold several different accounts.
+                            The derivation path has the following structure:<br/> <code>M / purpose' / coin_type' / account' / change / address_index</code><div class="">, where
+                        </p>
+                        <ul>
+                            <li><strong>M</strong> is the root node of the HD wallet.</li>
+                            <li><strong>purpose'</strong> is typically 44 and it indicates that the wallet is compatible with the BIP-44 standard.</li>
+                            <li><strong>coin_type'</strong> indicates the type of cryptocurrency (e.g., for Bitcoin, this number is 0).</li>
+                            <li><strong>account'</strong> indicates the wallet account number. Starting from 0, the number will be increased by 1 after creating a new account within the same wallet.</li>
+                            <li><strong>change</strong> indicates if the address is external (1) to receive funds or internal (0) to change address.</li>
+                            <li><strong>address_index</strong> indicated the account address number. It starts from 0 and it is increased by 1 after creating a new address within the same account.</li>
+                        </ul>
+                        <p class="stat-text">
+                           Path levels marked with an apostrofo use hardened derivation, requiring the root private key, preventing root key recovery even if a child private key is compromised (<a href="https://satochip.io/bip44/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">SATOCHIP - Bitcoin Improvement Proposal #44 - BIP44</a>).
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">secp256k1 (Elliptic-Curve Public-Key Cryptography)</h3>
+                        <p class="stat-text">
+                            <strong>secp256k1</strong> is the elliptic curve cryptography standard used to generate private keys and create digital signaratures, allowing users to prove fund ownership without revealing their private keys.<br/>
+                            The standard transforms a private key into a public key through elliptic curve multiplication: it multiplies the 256-bit private key scalar <code>k</code> by a predefined generator point <code>G</code> on the curve (<code>Q = kG</code>); the result is a 64-byte public key.
+                            <br/>secp256k1 offers strong cryptographic security, efficient computation, relatively small key size, fast verification and low overhead (<a href="https://ecos.am/en/learn/secp256k1" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">ECOS - secp256k1</a>). 
+                        </p>
+                        <p class="stat-text">
+                            The security of the standard relies on the <strong>Elliptic Curve Logarithm Problem</strong>: deriving a public key from a private key is computationally easy; in contrast, deriving a private key from a public key is infeasible.<br/>
+                            Hence, users can safely share public keys. However, scalar multiplication does not destroy algebraic relations: public keys alone do not exhibit bitwise independence or true avalanche properties.
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Keccak-256 (Hash Function used in Ethereum Address Derivation)</h3>
+                        <p class="stat-text">
+                            <strong>Keccak-256</strong> is a cryptographic hash function that maps arbitrary-length data onto a 256-bit fingerprint. It is designed to resist collision, pre-image and second pre-image attacks, meaning that is computationally infeasible to find two different inputs that produce the same hash or to reverse a hash back into its original data.
+                            These properties make Keccak-256 suitable for integrity checks, digital signatures, address generation and commitment schemes. <br/>
+                            However, predictable, low-entropy or improperly encoded inputs can undermine security. Moreover, output hexadecimal string are difficult for humans to verify.
+                            <br/>The hash function works using a two-phase sponge construction:
+                        </p>
+                        <ul>
+                            <li>During the <strong>absorbing phase</strong>, pads and partitions input data into blocks, XORs them into a 1600-bit internal state and scrambles the state via the <strong>Kekkak-f permutation</strong>.</li>
+                            <li>During the <strong>squeezing phase</strong>, extracts 256 bits from the internal state to produce the final hash (<a href="https://rugdoc.io/wiki/docs/introduction-to-ethereums-keccak-256-algorithm/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">RugDoc - What Is the Kekkak-256 Algorithm? Complete Technical Guide</a>). </li>
+                        </ul>
+                        <p class="stat-text">In order to generate Ethereum addresses, the function keeps the last 20 bytes of the result.</p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">EIP-55 (Ethereum mixed-case Checksum Address)</h3>
+                        <p class="stat-text">
+                            <strong>EIP-55</strong> is a standard that defines a backward-compatible checksum for Ethereum addresses using mixed-case encoding. 
+                            It prevents accidental loss of funds due to human typing errors or copy-paste corruptions without altering the 20-byte length address.
+                        </p>
+                        <p class="stat-text">
+                            For each character in the address, if the corresponding bit in the hash is 1 and the character is a letter, it is capitalized. Otherwise it stays lowercase (<a href="https://cryptools.dev/tools/eip55-checksum/" target="_blank" rel="noopener noreffer" style="color: var(--button-primary); text-decoration: underline;">Cryptools - EIP-55 Checksum</a>). 
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Chronological Context</h2>
+                <div class="card-content">
+                    <p style="margin-bottom: 22px;">
+                        Evolution of asymmetric primitives, hashing paradigms, and wallet standards across four decades:
+                    </p>
+
+                    <!-- Horizontal Timeline Container -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; overflow-x: auto; padding: 12px 4px 16px 4px; margin-bottom: 24px;">
+
+                        <!-- Node 1: RSA -->
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">1977</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">RSA</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">Public-Key Cryptography based on the integer factorization problem</div>
+                        </div>
+
+                        <!-- Transition 1 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px; flex-shrink: 0;">
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <!-- Node 2: SHA-2 / SHA-512 -->
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 135px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">2001</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">SHA-2 / SHA-512</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">Standardized hashing</div>
+                        </div>
+
+                        <!-- Transition 2 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px; flex-shrink: 0;">
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <!-- Node 3: BIP-32 -->
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">2012</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">BIP-32</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">HD Wallets</div>
+                        </div>
+
+                        <!-- Transition 3 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px; flex-shrink: 0;">
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <!-- Node 4: BIP-39 -->
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">2013</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">BIP-39</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">Mnemonic seed for generating deterministic wallets</div>
+                        </div>
+
+                        <!-- Transition 4 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px; flex-shrink: 0;">
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <!-- Node 5: BIP-44 -->
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">2014</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">BIP-44</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">Derivation paths enabling multi-account HD wallets</div>
+                        </div>
+
+                        <!-- Transition 5 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px; flex-shrink: 0;">
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <!-- Node 6: SHA-3 -->
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 120px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">2015</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">SHA-3</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">Sponge Function</div>
+                        </div>
+
+                        <!-- Transition 6 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; min-width: 50px; flex-shrink: 0;">
+                            <span style="color: var(--button-primary); font-size: 1.25rem; font-weight: bold; line-height: 1;">&rarr;</span>
+                        </div>
+
+                        <div style="background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px 14px; text-align: center; min-width: 130px; flex-shrink: 0;">
+                            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: 2px;">2016</div>
+                            <div style="font-weight: 700; color: var(--title); font-size: 0.95rem;">EIP-55</div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary);">Ethereum mixed-case checksum address</div>
+                        </div>                        
+
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">SHA-2/SHA-512 vs Keccak-256 vs SHA-3</h2>
+                <div class="card-content">
+                    <p class="stat-text"><strong>SHA-2 / SHA-512</strong> are built on the Merkle–Damgård construction, used in legacy systems and to be safely deployed as a PRF or key derivation primitive, it requires wrapper construct such as <strong>HMAC</strong> and <strong>PBKDF2</strong>.<br/>
+                    Since the internal state is exposed as the digest output, they suffer from length-extension attacks.
+                    </p>
+                    <p class="stat-text"><strong>Kekkak-256</strong> is built on the permutation-based sponge construction over a wide internal state divided into bitrate and capacity. Since the capacity bits are never exposed, the algorithm is immune to length-extension attacks.<br/> It is used in modern designs and Ethereum to compress and hash the 64-byte public key into a 20-byte address.</p> 
+                    <p class="stat-text"><strong>SHA-3</strong> represents the NIST standard based on the Keccak sponge architecture. While sharing the same underlying permutation as Keccak-256, it introduces distinct domain separation padding bytes (<code>0x06</code> instead of <code>0x01</code>). Consequently, official SHA-3 produces completely different digest outputs from Keccak-256 for identical inputs and is not compatible with Ethereum address derivation.</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Why Ethereum Combines Heterogeneous Cryptographic Primitives</h2>
+                <div class="card-content">
+                    <p class="stat-text">
+                        Ethereum does not rely on a single algorithm because no single cryptographic primitive can simultaneously satisfy the conflicting requirements of security, human usability, verification, and on-chain efficiency. Instead, it enforces a strict <strong>separation of concerns</strong>:
+                    </p>
+                    <ul>
+                        <li><strong>Human Usability vs. Machine Entropy</strong> &rarr; BIP-39 bridges this gap by encoding random entropy into a human-readable mnemonic wordlist and using PBKDF2 key stretching to prevent brute-force attacks.</li>
+                        <li>
+                            <strong>Hierarchical Key Management vs. Static Storage</strong> &rarr; Instead of requiring a manual backup after every transaction, BIP-32 and BIP-44 use HMAC-SHA512 to deterministically derive an entire tree of multi-account keys from a single master seed.
+                        </li>
+                        <li>
+                            <strong>Identity and Authorization vs. Irreversibility</strong> &rarr; Hash functions are one-way and cannot prove identity; secp256k1 provides asymmetric elliptic curve cryptography to authorize transactions without exposing the secret private key.
+                        </li>
+                        <li>
+                            <strong>Breaking Algebraic Symmetries vs. Storage Efficiency</strong> &rarr; Elliptic curve multiplication preserves algebraic structures and exhibits geometric bias; Keccak-256 destroys these symmetries, providing a strict avalanche effect. 
+                        </li>
+                        <li>
+                            <strong>Error Detection vs. Backward Compatibility</strong> &rarr; Rather than altering address length with explicit checksum suffixes, EIP-55 embeds error detection into the casing of hexadecimal letters with zero byte overhead.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </body>
+</html>
