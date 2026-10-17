@@ -1,1 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Homework 3</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 980px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+            .sim-layout {
+                display: grid;
+                grid-template-columns: 420px 1fr;
+                gap: 24px;
+                align-items: start;
+                margin-top: 18px;
+            }
+
+            @media (max-width: 960px) {
+                .sim-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .canvas-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            canvas {
+                background-color: #050b18;
+                border: 2px solid #1e293b;
+                border-radius: 8px;
+                width: 100%;
+                max-width: 420px;
+                aspect-ratio: 1 / 1;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.12);
+            }
+
+            .canvas-legend {
+                width: 100%;
+                max-width: 420px;
+                background-color: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                padding: 8px 12px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px 12px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.78rem;
+                color: var(--text-secondary);
+            }
+
+            .legend-item strong {
+                color: var(--title);
+                font-family: monospace;
+            }
+
+            .legend-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                border: 1.5px solid #ffffff;
+                flex-shrink: 0;
+            }
+
+            .details-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            /* Riga controlli orizzontale compatta */
+            .calc-grid {
+                display: flex;
+                align-items: flex-end;
+                gap: 8px;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .control-group label {
+                font-weight: 600;
+                font-size: 0.76rem;
+                color: var(--title);
+                white-space: nowrap;
+            }
+
+            select, input[type="number"] {
+                padding: 4px 6px;
+                font-size: 0.82rem;
+                border: 1px solid var(--card-border);
+                border-radius: 5px;
+                background-color: var(--code-bg);
+                color: var(--text);
+                outline: none;
+                height: 32px;
+            }
+
+            select:focus, input[type="number"]:focus {
+                border-color: var(--button-primary);
+            }
+
+            #selectG {
+                width: 100px;
+            }
+
+            #inputPrivKey {
+                width: 58px;
+            }
+
+            #inputMessage {
+                width: 54px;
+            }
+
+            button {
+                padding: 0 10px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+                height: 32px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            button.btn-primary {
+                background-color: var(--button-primary);
+                color: #ffffff;
+            }
+
+            button.btn-primary:hover:not(:disabled) {
+                background-color: var(--other-buttons);
+            }
+
+            button.btn-secondary {
+                background-color: #e2e8f0;
+                color: var(--text);
+            }
+
+            button.btn-secondary:hover:not(:disabled) {
+                background-color: #cbd5e1;
+            }
+
+            .result-summary {
+                background-color: #f0fdf4;
+                border: 1px solid #86efac;
+                color: #14532d;
+                padding: 9px 12px;
+                border-radius: 6px;
+                font-size: 0.88rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                max-height: 290px;
+                overflow-y: auto;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-wrapper table tc code {
+                white-space: nowrap;
+                display: inline-block;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.83rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: var(--title);
+                padding: 7px 10px;
+                border-bottom: 2px solid var(--card-border);
+                font-weight: 700;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #edf2f7;
+                color: var(--text);
+            }
+
+            tr:nth-child(even) {
+                background-color: #fafcff;
+            }
+
+            .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <h1>Homework 3</h1>
+        </header>
+
+        <div class="main-container">
+            <section class="card">
+                <h2 class="card-title">Toy secp256k1 Encryption &amp; Decryption</h2>
+                <div class="card-content">
+                    <p>
+                        Configure the private key <code>k</code>, then encrypt and decrypt a scalar message <code>m</code> using the public key <code>Q</code> on the toy curve <code>y² ≡ x³ + 7 (mod 17)</code>.
+                    </p>
+
+                    <div class="sim-layout">
+                        <div class="canvas-box">
+                            <canvas id="eccSimCanvas" width="420" height="420"></canvas>
+                    
+                            
+                            <div class="canvas-legend">
+                                <div class="legend-item">
+                                    <span class="legend-dot" style="background-color: #38bdf8;"></span>
+                                    <span><strong>G</strong>: Base Generator</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot" style="background-color: #a855f7;"></span>
+                                    <span><strong>Q</strong>: Public Key</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot" style="background-color: #fbbf24;"></span>
+                                    <span><strong>m</strong>: Plaintext Message</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot" style="background-color: #22d3ee;"></span>
+                                    <span><strong>C1</strong>: Ephemeral Point</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot" style="background-color: #34d399;"></span>
+                                    <span><strong>C2</strong>: Ciphertext Point</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot" style="background-color: #f43f5e;"></span>
+                                    <span><strong>S</strong>: Shared Secret</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="details-panel">
+                            <div class="calc-grid">
+                                <div class="control-group">
+                                    <label for="selectG">Base Point G:</label>
+                                    <select id="selectG"></select>
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="inputPrivKey">Private Key k:</label>
+                                    <input type="number" id="inputPrivKey" value="3" min="1" max="8">
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="inputMessage">Message m:</label>
+                                    <input type="number" id="inputMessage" value="2" min="1" max="8">
+                                </div>
+
+                                <button id="btnEncrypt" class="btn-primary">Encrypt</button>
+                                <button id="btnDecrypt" class="btn-secondary" disabled>Decrypt</button>
+                            </div>
+
+                            <div id="resultBanner" class="result-summary">
+                                <span>Status: </span><strong id="labelStatus">-</strong>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 70px;">Phase</th>
+                                            <th style="width: 125px;">Operation</th>
+                                            <th>Resulting Point / Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="eccLogTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Encryption and Decryption Procedure</h3>
+                    <ol>
+                        <li>
+                            <strong>Key Generation (Recipient)</strong><br/>The recipient chooses a scalar private key <code>k</code> from the cyclic subgroup order, and computes the public key <code>Q = k · G</code> using elliptic curve scalar multiplication.<br/>
+                            The private key acts as a mathematical trapdoor hold exclusively by the recipient. It is required during decryption to remove the blinding mask.<br/>
+                            The public key is used by any sender to encrypt a message without knowing the recipient's private key.
+                        </li>
+                        <li>
+                            <strong>Plaintext Embedding (Sender)</strong><br/>The numeric plaintext message <code>m</code> is encoded by scalar multiplication with the base generator <code>G</code>:
+                            <code>P_m = m · G</code>
+                        </li>
+                        <li>
+                            <strong>Encryption (Sender)</strong><br/>The sender draws a random scalar nonce <code>r</code> (called <em>ephemeral key</em>) to ensure randomized encryption, and computes:
+                            <ul>
+                                <li>the public ephemeral hint <code>C₁ = r · G</code></li>
+                                <li>the shared blinding mask <code>S = r · Q = r · (k · G)</code></li>
+                                <li>the masked ciphertext point <code>C₂ = P_m + S = m · G + r · Q</code></li>
+                            </ul>
+                            The transmitted ciphertext is the point pair <code>(C₁, C₂).</code> 
+                        </li>
+                        <li>
+                            <strong>Decryption (Recipient)</strong><br/>
+                            Using its private key <code>k</code>, the recipient recovers the exact shared mask from <code>C₁</code>: <code>S' = k · C₁ = k · (r · G) = r · (k · G) = S</code><br/>
+                            Subtracting <code>S'</code> from <code></code> 
+                            Subtracting <code>S'</code> from <code>C₂</code>, the recipient is able to remove the mask and isolate the message point: <code>P_m = C₂ - S' = (P_m + S) - S</code>.<br/>
+                            Since <code>P_m = m · G</code>, the recipient solves the discrete logarithm to recover the original integer scalar <code>m</code>. 
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Interactive Caesar Cipher Simulation</h2>
+                <div class="card-content">
+                    <p>
+                        Encrypt and decrypt text messages using the classical monoalphabetic Caesar Cipher with a modular shift key <code>k ∈ [0, 25]</code>.
+                    </p>
+
+                    <div class="sim-layout" style="grid-template-columns: 1fr;">
+                        <div class="details-panel">
+                            <div class="calc-grid" style="grid-template-columns: 1fr 90px auto auto;">
+                                <div class="control-group">
+                                    <label for="caesarInputText">Message / Ciphertext:</label>
+                                    <input type="text" id="caesarInputText" value="" style="width: 100%; height: 32px; padding: 4px 8px; font-size: 0.85rem; border: 1px solid var(--card-border); border-radius: 5px; background: var(--code-bg);">
+                                </div>
+
+                                <div class="control-group">
+                                    <label for="caesarShift">Shift k:</label>
+                                    <input type="number" id="caesarShift" value="3" min="0" max="25" style="width: 100%;">
+                                </div>
+
+                                <button id="btnCaesarEncrypt" class="btn-primary">Encrypt</button>
+                                <button id="btnCaesarDecrypt" class="btn-secondary">Decrypt</button>
+                            </div>
+
+                            <div id="caesarStatusBanner" class="result-summary">
+                                <span>Result: </span><strong id="caesarStatusOutput">DWWDFN DW GDZQ</strong>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 90px;">Character</th>
+                                            <th style="width: 110px;">ASCII / Index</th>
+                                            <th style="width: 150px;">Modular Operation</th>
+                                            <th>Transformed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="caesarLogTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Toy ECC vs. Caesar Cipher</h3>
+                        <ol>
+                            <li><strong>Encryption and Decryption Procedures</strong>
+                                <ul>
+                                    <li><em>Caesar Cipher</em>: A <strong>symmetric</strong> cipher based on direct modular arithmetic over a 26-character alphabet (<code>c_i = m_i + k (mod 26)</code>). Encryption and decryption perform inverse shifts using the exact same secret integer <code>k</code>. It is completely <em>deterministic</em> since the same character always maps to the same ciphertext letter using the same <code>k</code>.</li>
+                                    <li><em>Toy ECC</em>: An <strong>asymmetric</strong> scheme built on geometric point addition over a finite field. Encryption uses the recipient's public key <code>Q</code> and a random ephemeral nonce <code>r</code>, yielding a point pair <code>(C₁, C₂)</code>. Only the owner of the private key <code>k</code> can unmask the message point to recover the original plaintext. It is <em>probabilistic</em>, meaning that the same plaintext yields different ciphertexts on each run, depending on the nonce value.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Key Space</strong>
+                                <ul>
+                                    <li><em>Caesar Cipher</em>: Has a trivial key space of 26 (<code>k ∈ [0, 25]</code>). Hence, an adversary can test every possible key (brute-force attack) in a fraction of millisecond.</li>
+                                    <li><em>Toy ECC</em>: In this toy configuration, the private key <code>k</code> is constrained to the base generator <code>G</code>'s cyclic subgroup order (for example, <code>k ∈ [1, 8] for G = (1, 5)</code>). In real world, the full secp256k1 has a private key space of ≈ 2<sup>256</sup>, making brute-force attacks physically impossible.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <strong>Statistical Properties</strong>
+                                <ul>
+                                    <li><em>Caesar Cipher</em>: Provides zero diffusion or confusion. It just rotates the plaintext frequency histogram by <code>k</code> positions without altering the relative distribution. High-frequency letters remain identifiable as peaks in the ciphertext, making it trivial to break via frequency analysis.</li>
+                                    <li><em>Toy ECC</em>: Point masking destroys linear character-to-character correlations across repeated ciphertexts. However, raw coordinate points remain algebraically constrained by the curve equation.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Statistical Cryptanalysis of the Caesar Cipher</h2>
+                <div class="card-content">
+                    <p>
+                        Recover the secret shift key <code>k</code> from ciphertext using three cryptanalytic techniques: brute-force search, single-letter frequency analysis, or n-gram scoring.
+                    </p>
+
+                    <div class="sim-layout" style="grid-template-columns: 1fr;">
+                        <div class="details-panel">
+                            <div class="calc-grid" style="display: flex; align-items: flex-end; gap: 8px; width: 100%; flex-wrap: nowrap;">
+                                <div class="control-group" style="flex: 1;">
+                                    <label for="cryptCiphertext">Ciphertext to Analyze:</label>
+                                    <input type="text" id="cryptCiphertext" value="KHOOR ZRUOG WKLV LV D VHFUHW PHVVDJH HQFUBSWHG ZLWK FDHVDU FLSKHU" style="width: 100%; height: 32px; padding: 4px 8px; font-size: 0.82rem; border: 1px solid var(--card-border); border-radius: 5px; background: var(--code-bg); color: var(--text); outline: none;">
+                                </div>
+
+                                <div class="control-group" style="width: 220px; flex-shrink: 0;">
+                                    <label for="cryptMethodSelect">Attack Method:</label>
+                                    <select id="cryptMethodSelect" style="width: 100%; height: 32px; padding: 4px 6px; font-size: 0.82rem; border: 1px solid var(--card-border); border-radius: 5px; background: var(--code-bg); color: var(--text); outline: none;">
+                                        <option value="freq">Letter-Frequency Analysis</option>
+                                        <option value="ngram">N-Gram Scoring</option>
+                                        <option value="bruteforce">Key Search (Brute-force)</option>
+                                    </select>
+                                </div>
+
+                                <button id="btnBreakCipher" class="btn-primary" style="height: 32px; padding: 0 14px; font-size: 0.8rem; font-weight: 700; border-radius: 5px; border: none; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Run Attack</button>
+                            </div>
+
+                            <div id="cryptStatusBanner" class="result-summary">
+                                <span>Inferred Key: </span><strong id="cryptKeyOutput">-</strong>
+                            </div>
+
+                            <div class="result-summary" style="background-color: #f8fafc; border-color: var(--card-border); color: var(--text);">
+                                <span>Decrypted Text: </span><strong id="cryptDecryptedOutput" style="color: var(--title); font-family: monospace;">-</strong>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr id="cryptTableHeadRow">
+                                            <th style="width: 75px;">Shift (k)</th>
+                                            <th style="width: 140px;" id="cryptMetricHeader">Score / Metric</th>
+                                            <th>Decryption Preview</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cryptLogTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Effectiveness and Comparison of Attack Strategies</h3>
+                        <p class="stat-text">
+                            Since the Caesar Cipher key space is limited to 26, different cryptanalytic techniques can be evaluated:
+                        </p>
+                        <ul style="display: flex; flex-direction: column; gap: 16px; padding-left: 20px; margin: 12px 0 0 0;">
+                            <li>
+                                <strong>Key Search (Brute-force)</strong><br/>Iterates through all 26 possible shifts. It requires no statistical assumptions about language, relying instead on human inspection or a dictionary lookup to spot intelligible words.<br/>Brute-force is ideal when the ciphertext is short (<code>length < 50</code>) or when the ciphertext might use a non-English language, making frequency-based methods less reliable.<br/>
+                                However, brute-force requires human judgment to identify the correct plaintext: when working with very short ciphertexts, multiple shifts might produce plausible-looking results.
+                            </li>
+                            <li>
+                                <strong>Letter-Frequency Analysis</strong><br/>Compares observed character counts with the expected probability distribution of English letters (e.g., 'E' ~12.7%, 'T' ~9.1%). The best candidate minimizes the Pearson χ² metric:
+                                <code>χ²(k) = Σ [ (Observed_i - Expected_i)² / Expected_i ]</code>.<br/>
+                                Highly effective for texts with <code>length > 50</code>, but vulnerable to statistical noise in short phrases (<code>lentgh < 20</code>) lacking common letters.<br/>
+                                Chi-squared test considers all 26 letters simultaneously rather than relying on a single most-frequent letter (simple frequency analysis), making it more reliable with short ciphertexts. 
+                                <br/>However, the adversary needs to know or guess what language the plaintext is in.
+                            </li>
+                            <li>
+                                <strong>N-Gram Scoring</strong><br/>Evaluates the likelihood of consecutive letter transitions (e.g., 'TH', 'HE', 'IN', 'ER') using log-likelihood summation. Because adjacent letters preserve contextual morphology, n-gram scoring reliably identifies the correct key even on very short sentences.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">Discrete Logarithm Key-Recovery Attack on Toy ECC</h2>
+                <div class="card-content">
+                    <p>
+                        Exploit the limited private key space of the toy ECC scheme to solve the Elliptic Curve Discrete Logarithm Problem (ECDLP) through brute-force scalar enumeration, recovering the private key <code>k</code> directly from the public key <code>Q</code>.
+                    </p>
+
+                    <div class="sim-layout" style="grid-template-columns: 1fr;">
+                        <div class="details-panel">
+                            <div class="calc-grid" style="display: flex; align-items: flex-end; gap: 8px; width: 100%; flex-wrap: nowrap;">
+                                <div class="control-group" style="width: 140px;">
+                                    <label for="attackSelectG">Base Point G:</label>
+                                    <select id="attackSelectG" style="width: 100%; height: 32px; padding: 4px 6px; font-size: 0.82rem; border: 1px solid var(--card-border); border-radius: 5px; background: var(--code-bg); color: var(--text);"></select>
+                                </div>
+
+                                <div class="control-group" style="flex: 1;">
+                                    <label for="attackTargetQ">Target Public Key Q:</label>
+                                    <select id="attackTargetQ" style="width: 100%; height: 32px; padding: 4px 6px; font-size: 0.82rem; border: 1px solid var(--card-border); border-radius: 5px; background: var(--code-bg); color: var(--text);"></select>
+                                </div>
+
+                                <button id="btnRunEccAttack" class="btn-primary" style="height: 32px; padding: 0 14px; font-size: 0.8rem; font-weight: 700; border-radius: 5px; border: none; cursor: pointer; white-space: nowrap; flex-shrink: 0;">Recover Key k</button>
+                            </div>
+
+                            <div id="attackResultBanner" class="result-summary">
+                                <span>Attack Outcome: </span><strong id="attackStatusOutput">-</strong>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 110px;">Candidate (k')</th>
+                                            <th style="width: 170px;">Computed Point (k' · G)</th>
+                                            <th style="width: 140px;">Target Q</th>
+                                            <th>Verification Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="attackLogTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Cryptanalytic Comparison and Security Evaluation</h3>
+                        <ul style="display: flex; flex-direction: column; gap: 16px; padding-left: 20px; margin: 12px 0 0 0;">
+                            <li>
+                                <strong>Differences from the Caesar Statistical Attack</strong><br/>
+                                The Caesar attack is <em>purely ciphertext-only and linguistic</em>: it does not solve an underlying algebraic trapdoor but rather measures empirical deviation against English letter distributions. In contrast, this ECC attack is <em>algebraic and deterministic</em>: it computes points directly on the group using public generator <code>G</code> until matching public key <code>Q = k · G</code>. It requires no dictionarY or language assumptions to succed.
+                            </li>
+
+                            <li>
+                                <strong>Infeasibility against Standard secp256k1</strong><br/>
+                                In the toy demonstration over, the subgroup order is negligible (<code>n &le; 17</code>), allowing brute-force attacks in microseconds. In standard secp256k1, the group order is a 256-bit prime:
+                                <code>n ≈ 2²⁵⁶</code>.<br/>
+                                Solving ECDLP by brute-force requires <code>O(n)</code> steps. Even optimal general-purpose algorithms like Pollard's rho require <code>O(&radic;n) &approx; 2<sup>128</sup></code> point operations, exceeding the computational energy capacity of modern distributed infrastructures.
+                            </li>
+
+                            <li>
+                                <strong>Weaknesses Arising from Design vs. Restricted Key Space:</strong>
+                                <ul>
+                                    <li>
+                                        <em>Restricted Key Space:</em> The vulnerability exposed in this simulation comes from parameter reduction (<code>k &in; [1, n-1] with small n</code>). An adversary trivially precomputes a lookup table of multiples <code>i · G</code>.
+                                    </li>
+                                    <li>
+                                        <em>Design Weaknesses in Toy Schemes:</em>
+                                        Basic additive ElGamal over points (<code>C₂ = P_m + rQ</code>) is <em>malleable</em> and lacks ciphertext integrity checks. In real world, protocols use hybrid standards like <strong>ECIES</strong> (combining ECDH key derivation with AES-GCM or HMAC authenticated encryption) to prevent chosen-ciphertext attacks (CCA).
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 class="card-title">References</h2>
+                <div class="card-content">
+                    <ol style="padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.93rem; color: var(--text);">
+                        <li>
+                            A. Menezes, P. van Oorschot, B. Preneel. 
+                            <em>Textbook of Applied Cryptography</em>, Chapter 9: Elliptic Curve Cryptography (Section 9.5 &amp; Exercise 9.25: "Elliptic curve encryption").
+                        </li>
+                        <li>
+                            F. P. Caforio. 
+                            <em>Il cifrario di Cesare: Implementazione e Principi Crittografici</em>. 
+                            <a href="https://www.francescopaolocaforio.com/wp-content/uploads/2025/02/Il-cifrario-di-Cesare.pdf" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">francescopaolocaforio.com</a>.
+                        </li>
+                        <li>
+                            CaesarCipher.org. 
+                            <em>How to Break the Caesar Cipher: 3 Proven Cryptanalysis Methods</em>. 
+                            <a href="https://caesarcipher.org/learn/breaking-caesar-cipher-methods" target="_blank" rel="noopener noreferrer" style="color: var(--button-primary); text-decoration: underline;">caesarcipher.org</a>.
+                        </li>
+                        <li>
+                            A. Menezes, P. van Oorschot, B. Preneel. 
+                            <em>Textbook of Applied Cryptography</em>, Chapter 9: Elliptic Curve Cryptography (Section 9.2: "Elliptic Curve Discrete Logarithm Problem").
+                        </li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+        
+        <script>
+            (function() {
+                const p = 17;
+                const a = 0;
+                const b = 7;
+
+                const selectG = document.getElementById('attackSelectG');
+                const selectQ = document.getElementById('attackTargetQ');
+                const btnAttack = document.getElementById('btnRunEccAttack');
+                const statusOutput = document.getElementById('attackStatusOutput');
+                const logTable = document.getElementById('attackLogTableBody');
+
+                function mod(n, m) { return ((n % m) + m) % m; }
+
+                function modInverse(val, m) {
+                    val = mod(val, m);
+                    for (let x = 1; x < m; x++) {
+                        if (mod(val * x, m) === 1) return x;
+                    }
+                    return null;
+                }
+
+                function pointAdd(P, Q) {
+                    if (!P) return { point: Q };
+                    if (!Q) return { point: P };
+                    if (P.x === Q.x && mod(P.y + Q.y, p) === 0) return { point: null };
+
+                    let lambda;
+                    if (P.x === Q.x && P.y === Q.y) {
+                        if (P.y === 0) return { point: null };
+                        const num = mod(3 * P.x * P.x + a, p);
+                        const den = mod(2 * P.y, p);
+                        lambda = mod(num * modInverse(den, p), p);
+                    } else {
+                        const num = mod(Q.y - P.y, p);
+                        const den = mod(Q.x - P.x, p);
+                        lambda = mod(num * modInverse(den, p), p);
+                    }
+
+                    const rx = mod(lambda * lambda - P.x - Q.x, p);
+                    const ry = mod(lambda * (P.x - rx) - P.y, p);
+                    return { point: { x: rx, y: ry } };
+                }
+
+                function scalarMul(scalar, pt) {
+                    let res = null;
+                    for (let i = 0; i < scalar; i++) {
+                        res = pointAdd(res, pt).point;
+                    }
+                    return res;
+                }
+
+                function getCurvePoints() {
+                    const points = [];
+                    for (let x = 0; x < p; x++) {
+                        const rhs = mod(x * x * x + b, p);
+                        for (let y = 0; y < p; y++) {
+                            if (mod(y * y, p) === rhs) points.push({ x, y });
+                        }
+                    }
+                    return points;
+                }
+
+                const validPoints = getCurvePoints();
+
+                validPoints.forEach(pt => {
+                    const opt = document.createElement('option');
+                    opt.value = `${pt.x},${pt.y}`;
+                    opt.textContent = `(${pt.x}, ${pt.y})`;
+                    if (pt.x === 1 && pt.y === 5) opt.selected = true;
+                    selectG.appendChild(opt);
+                });
+
+                function populateQCandidates() {
+                    const [gx, gy] = selectG.value.split(',').map(Number);
+                    const G = { x: gx, y: gy };
+                    selectQ.innerHTML = '';
+
+                    let curr = G;
+                    let order = 1;
+                    while (curr !== null && order <= 25) {
+                        const opt = document.createElement('option');
+                        opt.value = `${curr.x},${curr.y}`;
+                        opt.textContent = `Q = (${curr.x}, ${curr.y}) [scalar = ${order}]`;
+                        if (order === 3) opt.selected = true;
+                        selectQ.appendChild(opt);
+
+                        curr = pointAdd(curr, G).point;
+                        order++;
+                    }
+                }
+
+                selectG.addEventListener('change', populateQCandidates);
+                populateQCandidates();
+
+                btnAttack.addEventListener('click', () => {
+                    const [gx, gy] = selectG.value.split(',').map(Number);
+                    const [qx, qy] = selectQ.value.split(',').map(Number);
+                    const G = { x: gx, y: gy };
+                    const targetQ = { x: qx, y: qy };
+
+                    logTable.innerHTML = '';
+                    let recoveredK = null;
+                    let currentPt = null;
+
+                    for (let kCand = 1; kCand <= 20; kCand++) {
+                        currentPt = pointAdd(currentPt, G).point;
+                        const ptStr = currentPt ? `(${currentPt.x}, ${currentPt.y})` : 'O (Infinity)';
+                        const isMatch = currentPt && currentPt.x === targetQ.x && currentPt.y === targetQ.y;
+
+                        const rowBg = isMatch ? 'style="background-color: #f0fdf4;"' : '';
+                        const statusBadge = isMatch 
+                            ? '<strong style="color: #15803d;">MATCH FOUND ✓</strong>' 
+                            : '<span style="color: var(--text-secondary);">Mismatch</span>';
+
+                        logTable.innerHTML += `
+                            <tr ${rowBg}>
+                                <td><strong>k' = ${kCand}</strong></td>
+                                <td><code>${ptStr}</code></td>
+                                <td><code>(${targetQ.x}, ${targetQ.y})</code></td>
+                                <td>${statusBadge}</td>
+                            </tr>
+                        `;
+
+                        if (isMatch) {
+                            recoveredK = kCand;
+                            break;
+                        }
+                    }
+
+                    if (recoveredK !== null) {
+                        statusOutput.textContent = `Private key recovered successfully: k = ${recoveredK}`;
+                    } else {
+                        statusOutput.textContent = `Target key not found within subgroup search range`;
+                    }
+                });
+            })();
+        </script>
+
+        <script>
+            (function() {
+                // Frequenze standard delle lettere A-Z in lingua inglese
+                const ENGLISH_FREQ = [
+                    0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015,
+                    0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749,
+                    0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758,
+                    0.00978, 0.02360, 0.00150, 0.01974, 0.00074
+                ];
+
+                // Top 30 bigrammi comuni in inglese con pesi di log-frequenza normalizzati
+                const COMMON_BIGRAMS = {
+                    'TH': 3.89, 'HE': 3.68, 'IN': 3.44, 'ER': 3.28, 'AN': 3.19,
+                    'RE': 3.10, 'ED': 2.95, 'ON': 2.90, 'ES': 2.87, 'ST': 2.85,
+                    'EN': 2.75, 'AT': 2.72, 'TO': 2.65, 'NT': 2.61, 'HA': 2.56,
+                    'ND': 2.50, 'OU': 2.45, 'EA': 2.40, 'NG': 2.38, 'AS': 2.33,
+                    'OR': 2.30, 'TI': 2.27, 'IS': 2.25, 'ET': 2.22, 'IT': 2.20,
+                    'AR': 2.15, 'TE': 2.12, 'SE': 2.10, 'HI': 2.05, 'OF': 2.00
+                };
+
+                const inputEl = document.getElementById('cryptCiphertext');
+                const methodSelect = document.getElementById('cryptMethodSelect');
+                const btnBreak = document.getElementById('btnBreakCipher');
+                const keyOut = document.getElementById('cryptKeyOutput');
+                const decOut = document.getElementById('cryptDecryptedOutput');
+                const tableBody = document.getElementById('cryptLogTableBody');
+                const metricHeader = document.getElementById('cryptMetricHeader');
+
+                function decryptWithShift(text, shift) {
+                    let res = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const c = text[i];
+                        if (c >= 'A' && c <= 'Z') {
+                            const idx = c.charCodeAt(0) - 65;
+                            res += String.fromCharCode(((idx - shift + 26) % 26) + 65);
+                        } else {
+                            res += c;
+                        }
+                    }
+                    return res;
+                }
+
+                function runAttack() {
+                    const raw = inputEl.value.toUpperCase();
+                    const lettersOnly = raw.replace(/[^A-Z]/g, '');
+                    const N = lettersOnly.length;
+                    const method = methodSelect.value;
+
+                    if (N === 0) {
+                        keyOut.textContent = 'No alphabetic characters found';
+                        decOut.textContent = '-';
+                        tableBody.innerHTML = '';
+                        return;
+                    }
+
+                    const results = [];
+
+                    if (method === 'freq') {
+                        metricHeader.textContent = 'Chi-Squared (χ²)';
+                        let bestShift = 0;
+                        let minChi2 = Infinity;
+
+                        for (let shift = 0; shift < 26; shift++) {
+                            const candidateText = decryptWithShift(lettersOnly, shift);
+                            const counts = new Array(26).fill(0);
+                            for (let i = 0; i < candidateText.length; i++) {
+                                counts[candidateText.charCodeAt(i) - 65]++;
+                            }
+
+                            let chi2 = 0;
+                            for (let i = 0; i < 26; i++) {
+                                const expected = N * ENGLISH_FREQ[i];
+                                chi2 += Math.pow(counts[i] - expected, 2) / expected;
+                            }
+
+                            results.push({ shift, score: chi2, preview: decryptWithShift(raw, shift) });
+                            if (chi2 < minChi2) {
+                                minChi2 = chi2;
+                                bestShift = shift;
+                            }
+                        }
+
+                        // Chi2: punteggio minore = migliore
+                        results.sort((a, b) => a.score - b.score);
+                        keyOut.textContent = `k = ${bestShift} (min χ² = ${minChi2.toFixed(2)})`;
+                        decOut.textContent = decryptWithShift(raw, bestShift);
+
+                    } else if (method === 'ngram') {
+                        metricHeader.textContent = 'Bigram Log-Score';
+                        let bestShift = 0;
+                        let maxScore = -Infinity;
+
+                        for (let shift = 0; shift < 26; shift++) {
+                            const candidateText = decryptWithShift(lettersOnly, shift);
+                            let score = 0;
+                            for (let i = 0; i < candidateText.length - 1; i++) {
+                                const bigram = candidateText.substring(i, i + 2);
+                                score += (COMMON_BIGRAMS[bigram] || 0);
+                            }
+
+                            results.push({ shift, score, preview: decryptWithShift(raw, shift) });
+                            if (score > maxScore) {
+                                maxScore = score;
+                                bestShift = shift;
+                            }
+                        }
+
+                        // N-Gram: punteggio maggiore = migliore
+                        results.sort((a, b) => b.score - a.score);
+                        keyOut.textContent = `k = ${bestShift} (score = ${maxScore.toFixed(2)})`;
+                        decOut.textContent = decryptWithShift(raw, bestShift);
+
+                    } else {
+                        // Brute force esaustivo (ordine k da 0 a 25)
+                        metricHeader.textContent = 'Key Index';
+                        for (let shift = 0; shift < 26; shift++) {
+                            results.push({ shift, score: shift, preview: decryptWithShift(raw, shift) });
+                        }
+                        keyOut.textContent = 'All 26 candidate keys evaluated';
+                        decOut.textContent = 'Inspect table below for intelligible plaintext';
+                    }
+
+                    tableBody.innerHTML = '';
+                    results.forEach((item, idx) => {
+                        const isBest = (method !== 'bruteforce' && idx === 0);
+                        const rowBg = isBest ? 'style="background-color: #f0fdf4;"' : '';
+                        const scoreDisplay = method === 'bruteforce' ? `k = ${item.shift}` : item.score.toFixed(2);
+
+                        tableBody.innerHTML += `
+                            <tr ${rowBg}>
+                                <td style="white-space: nowrap;"><strong>${item.shift}</strong> ${isBest ? '★' : ''}</td>
+                                <td style="white-space: nowrap;">${scoreDisplay}</td>
+                                <td><code>${item.preview}</code></td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                btnBreak.addEventListener('click', runAttack);
+                methodSelect.addEventListener('change', runAttack);
+
+                // Esecuzione iniziale al caricamento
+                runAttack();
+            })();
+        </script>
+
+        <script>
+            (function() {
+                const inputText = document.getElementById('caesarInputText');
+                const shiftInput = document.getElementById('caesarShift');
+                const btnEncrypt = document.getElementById('btnCaesarEncrypt');
+                const btnDecrypt = document.getElementById('btnCaesarDecrypt');
+                const statusOutput = document.getElementById('caesarStatusOutput');
+                const logTableBody = document.getElementById('caesarLogTableBody');
+
+                function processCaesar(isDecrypt = false) {
+                    const raw = inputText.value.toUpperCase();
+                    let shift = parseInt(shiftInput.value) || 0;
+                    shift = ((shift % 26) + 26) % 26;
+                    const effShift = isDecrypt ? (26 - shift) % 26 : shift;
+
+                    let result = '';
+                    logTableBody.innerHTML = '';
+
+                    for (let i = 0; i < raw.length; i++) {
+                        const ch = raw[i];
+                        if (ch >= 'A' && ch <= 'Z') {
+                            const origIdx = ch.charCodeAt(0) - 65;
+                            const newIdx = (origIdx + effShift) % 26;
+                            const newCh = String.fromCharCode(newIdx + 65);
+                            result += newCh;
+
+                            const opStr = isDecrypt
+                                ? `(${origIdx} - ${shift}) mod 26`
+                                : `(${origIdx} + ${shift}) mod 26`;
+
+                            logTableBody.innerHTML += `
+                                <tr>
+                                    <td><strong>'${ch}'</strong></td>
+                                    <td>${origIdx}</td>
+                                    <td><code>${opStr}</code></td>
+                                    <td><strong>'${newCh}'</strong> (${newIdx})</td>
+                                </tr>
+                            `;
+                        } else {
+                            result += ch;
+                        }
+                    }
+
+                    statusOutput.textContent = result || '-';
+                }
+
+                btnEncrypt.addEventListener('click', () => processCaesar(false));
+                btnDecrypt.addEventListener('click', () => processCaesar(true));
+
+                // Esecuzione iniziale con i valori di default
+                processCaesar(false);
+            })();
+        </script>
+
+        <script>
+            (function() {
+                const p = 17;
+                const a = 0;
+                const b = 7;
+
+                const canvas = document.getElementById('eccSimCanvas');
+                const ctx = canvas.getContext('2d');
+                const selectG = document.getElementById('selectG');
+                const inputPrivKey = document.getElementById('inputPrivKey');
+                const inputMessage = document.getElementById('inputMessage');
+                const btnEncrypt = document.getElementById('btnEncrypt');
+                const btnDecrypt = document.getElementById('btnDecrypt');
+                const labelStatus = document.getElementById('labelStatus');
+                const eccLogTableBody = document.getElementById('eccLogTableBody');
+
+                const pad = 36;
+                let persistentLines = [];
+                let labeledPoints = [];
+                let currentCiphertext = null;
+                let currentG = { x: 1, y: 5 };
+                let currentOrder = 9;
+
+                function mod(n, m) {
+                    return ((n % m) + m) % m;
+                }
+
+                function modInverse(val, m) {
+                    val = mod(val, m);
+                    for (let x = 1; x < m; x++) {
+                        if (mod(val * x, m) === 1) return x;
+                    }
+                    return null;
+                }
+
+                function getCurvePoints() {
+                    const points = [];
+                    for (let x = 0; x < p; x++) {
+                        const rhs = mod(x * x * x + b, p);
+                        for (let y = 0; y < p; y++) {
+                            if (mod(y * y, p) === rhs) points.push({ x, y });
+                        }
+                    }
+                    return points;
+                }
+                const validPoints = getCurvePoints();
+
+                function pointAdd(P, Q) {
+                        if (!P) return { point: Q };
+                        if (!Q) return { point: P };
+
+                        if (P.x === Q.x && mod(P.y + Q.y, p) === 0) return { point: null };
+
+                        let lambda;
+                        if (P.x === Q.x && P.y === Q.y) {
+                            if (P.y === 0) return { point: null };
+                            const num = mod(3 * P.x * P.x + a, p);
+                            const den = mod(2 * P.y, p);
+                            lambda = mod(num * modInverse(den, p), p);
+                        } else {
+                            const num = mod(Q.y - P.y, p);
+                            const den = mod(Q.x - P.x, p);
+                            lambda = mod(num * modInverse(den, p), p);
+                        }
+
+                        const rx = mod(lambda * lambda - P.x - Q.x, p);
+                        const ry = mod(lambda * (P.x - rx) - P.y, p);
+                        return { point: { x: rx, y: ry } };
+                    }
+
+                    function scalarMul(scalar, pt) {
+                        let res = null;
+                        for (let i = 0; i < scalar; i++) {
+                            res = pointAdd(res, pt).point;
+                        }
+                        return res;
+                    }
+
+                    function pointNeg(pt) {
+                        if (!pt) return null;
+                        return { x: pt.x, y: mod(p - pt.y, p) };
+                    }
+
+                    function pointSub(P1, P2) {
+                        return pointAdd(P1, pointNeg(P2)).point;
+                    }
+
+                    function getPointOrder(pt) {
+                        let curr = pt;
+                        let count = 1;
+                        while (curr !== null && count <= 30) {
+                            curr = pointAdd(curr, pt).point;
+                            count++;
+                        }
+                        return count;
+                    }
+
+                    validPoints.forEach(pt => {
+                        const opt = document.createElement('option');
+                        opt.value = `${pt.x},${pt.y}`;
+                        opt.textContent = `(${pt.x}, ${pt.y})`;
+                        if (pt.x === 1 && pt.y === 5) opt.selected = true;
+                        selectG.appendChild(opt);
+                    });
+
+                    function updateBasePoint() {
+                        const [gx, gy] = selectG.value.split(',').map(Number);
+                        currentG = { x: gx, y: gy };
+                        currentOrder = getPointOrder(currentG);
+
+                        const maxScalar = Math.max(1, currentOrder - 1);
+                        inputPrivKey.max = maxScalar;
+                        inputMessage.max = maxScalar;
+
+                        if (parseInt(inputPrivKey.value) > maxScalar) inputPrivKey.value = Math.min(2, maxScalar);
+                        if (parseInt(inputMessage.value) > maxScalar) inputMessage.value = 1;
+
+                        currentCiphertext = null;
+                        persistentLines = [];
+                        labeledPoints = [{ pt: currentG, label: 'G', color: '#38bdf8' }];
+                        eccLogTableBody.innerHTML = '';
+                        labelStatus.textContent = '-';
+                        btnDecrypt.disabled = true;
+                        drawScene();
+                    }
+
+                    selectG.addEventListener('change', updateBasePoint);
+
+                    function toCanvas(pt) {
+                        const step = (canvas.width - 2 * pad) / (p - 1);
+                        return {
+                            cx: pad + pt.x * step,
+                            cy: canvas.height - (pad + pt.y * step)
+                        };
+                    }
+
+                    function drawScene() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        const step = (canvas.width - 2 * pad) / (p - 1);
+
+                        ctx.strokeStyle = '#334155';
+                        ctx.lineWidth = 1;
+                        for (let i = 0; i < p; i++) {
+                            const pos = pad + i * step;
+                            ctx.beginPath();
+                            ctx.moveTo(pos, pad);
+                            ctx.lineTo(pos, canvas.height - pad);
+                            ctx.stroke();
+
+                            ctx.beginPath();
+                            ctx.moveTo(pad, pos);
+                            ctx.lineTo(canvas.width - pad, pos);
+                            ctx.stroke();
+                        }
+
+                        ctx.fillStyle = '#f8fafc';
+                        ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+                        for (let i = 0; i < p; i++) {
+                            const pos = pad + i * step;
+                            ctx.fillText(i, pos - (i >= 10 ? 7 : 3), canvas.height - pad + 18);
+                            const yVal = p - 1 - i;
+                            ctx.fillText(yVal, pad - (yVal >= 10 ? 24 : 18), pad + i * step + 4);
+                        }
+
+                        persistentLines.forEach(line => {
+                            if (!line.from || !line.to) return;
+                            const p1 = toCanvas(line.from);
+                            const p2 = toCanvas(line.to);
+                            ctx.beginPath();
+                            ctx.moveTo(p1.cx, p1.cy);
+                            ctx.lineTo(p2.cx, p2.cy);
+                            ctx.strokeStyle = line.color || '#38bdf8';
+                            ctx.lineWidth = 2.5;
+                            ctx.stroke();
+                        });
+
+                        validPoints.forEach(pt => {
+                            const c = toCanvas(pt);
+                            ctx.beginPath();
+                            ctx.arc(c.cx, c.cy, 4.5, 0, 2 * Math.PI);
+                            ctx.fillStyle = '#64748b';
+                            ctx.fill();
+                        });
+
+                        labeledPoints.forEach(lp => {
+                            if (!lp.pt) return;
+                            const c = toCanvas(lp.pt);
+
+                            ctx.beginPath();
+                            ctx.arc(c.cx, c.cy, 6.5, 0, 2 * Math.PI);
+                            ctx.fillStyle = lp.color;
+                            ctx.fill();
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+
+                            ctx.font = 'bold 11px system-ui, sans-serif';
+                            const textWidth = ctx.measureText(lp.label).width;
+                            ctx.fillStyle = 'rgba(5, 11, 24, 0.85)';
+                            ctx.fillRect(c.cx + 7, c.cy - 14, textWidth + 6, 15);
+
+                            ctx.fillStyle = lp.color;
+                            ctx.fillText(lp.label, c.cx + 10, c.cy - 2);
+                        });
+                    }
+
+                    btnEncrypt.addEventListener('click', () => {
+                        eccLogTableBody.innerHTML = '';
+                        persistentLines = [];
+                        labeledPoints = [];
+
+                        // k = chiave privata
+                        const k = parseInt(inputPrivKey.value);
+                        const m = parseInt(inputMessage.value);
+                        const maxNonce = Math.max(1, currentOrder - 1);
+
+                        // Q = k * G
+                        const Q = scalarMul(k, currentG);
+                        // r = nonce casuale
+                        const r = Math.floor(Math.random() * maxNonce) + 1;
+
+                        const C1 = scalarMul(r, currentG);
+                        const S = scalarMul(r, Q);
+                        const Pm = scalarMul(m, currentG);
+                        const C2 = pointAdd(Pm, S).point;
+
+                        currentCiphertext = { C1, C2, k, m, Pm, Q, S };
+
+                        labeledPoints.push({ pt: currentG, label: 'G', color: '#38bdf8' });
+                        if (Q) labeledPoints.push({ pt: Q, label: 'Q', color: '#a855f7' });
+                        if (Pm) labeledPoints.push({ pt: Pm, label: 'm', color: '#fbbf24' });
+                        if (C1) labeledPoints.push({ pt: C1, label: 'C1', color: '#22d3ee' });
+                        if (S) labeledPoints.push({ pt: S, label: 'S', color: '#f43f5e' });
+                        if (C2) labeledPoints.push({ pt: C2, label: 'C2', color: '#34d399' });
+
+                        if (Pm && C2) persistentLines.push({ from: Pm, to: C2, color: '#34d399' });
+                        if (S && C2) persistentLines.push({ from: S, to: C2, color: '#f43f5e' });
+
+                        const c1Str = C1 ? `(${C1.x}, ${C1.y})` : 'O';
+                        const c2Str = C2 ? `(${C2.x}, ${C2.y})` : 'O';
+
+                        // Tabella con diciture semplificate
+                        eccLogTableBody.innerHTML = `
+                            <tr><td><strong>Keys</strong></td><td>Q = ${k} · G</td><td><strong>(${Q ? Q.x + ', ' + Q.y : 'O'})</strong></td></tr>
+                            <tr><td><strong>Plaintext</strong></td><td>P_m = ${m} · G</td><td>(${Pm ? Pm.x + ', ' + Pm.y : 'O'})</td></tr>
+                            <tr><td><strong>Nonce</strong></td><td>r</td><td>${r}</td></tr>
+                            <tr><td><strong>Encrypt</strong></td><td>C₁ = ${r} · G</td><td><strong>${c1Str}</strong></td></tr>
+                            <tr><td><strong>Encrypt</strong></td><td>S = ${r} · Q</td><td>(${S ? S.x + ', ' + S.y : 'O'})</td></tr>
+                            <tr style="background-color: #f0fdf4;"><td><strong>Ciphertext</strong></td><td>C₂ = P_m + S</td><td><strong>${c2Str}</strong></td></tr>
+                        `;
+
+                        labelStatus.textContent = `Encrypted: (C1: ${c1Str}, C2: ${c2Str})`;
+                        btnDecrypt.disabled = false;
+                        drawScene();
+                    });
+
+                    btnDecrypt.addEventListener('click', () => {
+                        if (!currentCiphertext) return;
+                        const { C1, C2, k, m, Pm } = currentCiphertext;
+
+                        // S' = k * C1
+                        const S_prime = scalarMul(k, C1);
+                        const Pm_recovered = pointSub(C2, S_prime);
+
+                        let recovered_m = null;
+                        let candidatePoint = null;
+                        for (let c = 1; c < currentOrder; c++) {
+                            candidatePoint = pointAdd(candidatePoint, currentG).point;
+                            if (candidatePoint && Pm_recovered && candidatePoint.x === Pm_recovered.x && candidatePoint.y === Pm_recovered.y) {
+                                recovered_m = c;
+                                break;
+                            }
+                        }
+
+                        if (S_prime && C2) persistentLines.push({ from: C2, to: Pm_recovered, color: '#fbbf24' });
+
+                        eccLogTableBody.innerHTML += `
+                            <tr style="background-color: #fefce8;"><td><strong>Decrypt</strong></td><td>S' = ${k} · C₁</td><td>(${S_prime ? S_prime.x + ', ' + S_prime.y : 'O'})</td></tr>
+                            <tr style="background-color: #f0fdf4;"><td><strong>Recovered</strong></td><td>P_m = C₂ - S'</td><td><strong>m = ${recovered_m} (${recovered_m === m ? 'MATCH ✓' : 'ERROR'})</strong></td></tr>
+                        `;
+
+                        labelStatus.textContent = `Decrypted: m = ${recovered_m}`;
+                        btnDecrypt.disabled = true;
+                        drawScene();
+                    });
+
+                    updateBasePoint();
+            })();
+        </script>
+    </body>
+</html>
