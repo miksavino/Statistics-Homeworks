@@ -1,1 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <title>Homework 3</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 980px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+            .sim-layout {
+                display: grid;
+                grid-template-columns: 420px 1fr;
+                gap: 24px;
+                align-items: start;
+                margin-top: 18px;
+            }
+
+            @media (max-width: 960px) {
+                .sim-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .canvas-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            canvas {
+                background-color: #050b18;
+                border: 2px solid #1e293b;
+                border-radius: 8px;
+                width: 100%;
+                max-width: 420px;
+                aspect-ratio: 1 / 1;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.12);
+            }
+
+            .canvas-legend {
+                width: 100%;
+                max-width: 420px;
+                background-color: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                padding: 8px 12px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px 12px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.78rem;
+                color: var(--text-secondary);
+            }
+
+            .legend-item strong {
+                color: var(--title);
+                font-family: monospace;
+            }
+
+            .legend-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                border: 1.5px solid #ffffff;
+                flex-shrink: 0;
+            }
+
+            .details-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            /* Riga controlli orizzontale compatta */
+            .calc-grid {
+                display: flex;
+                align-items: flex-end;
+                gap: 8px;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .control-group label {
+                font-weight: 600;
+                font-size: 0.76rem;
+                color: var(--title);
+                white-space: nowrap;
+            }
+
+            select, input[type="number"] {
+                padding: 4px 6px;
+                font-size: 0.82rem;
+                border: 1px solid var(--card-border);
+                border-radius: 5px;
+                background-color: var(--code-bg);
+                color: var(--text);
+                outline: none;
+                height: 32px;
+            }
+
+            select:focus, input[type="number"]:focus {
+                border-color: var(--button-primary);
+            }
+
+            #selectG {
+                width: 100px;
+            }
+
+            #inputPrivKey {
+                width: 58px;
+            }
+
+            #inputMessage {
+                width: 54px;
+            }
+
+            button {
+                padding: 0 10px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+                height: 32px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            button.btn-primary {
+                background-color: var(--button-primary);
+                color: #ffffff;
+            }
+
+            button.btn-primary:hover:not(:disabled) {
+                background-color: var(--other-buttons);
+            }
+
+            button.btn-secondary {
+                background-color: #e2e8f0;
+                color: var(--text);
+            }
+
+            button.btn-secondary:hover:not(:disabled) {
+                background-color: #cbd5e1;
+            }
+
+            .result-summary {
+                background-color: #f0fdf4;
+                border: 1px solid #86efac;
+                color: #14532d;
+                padding: 9px 12px;
+                border-radius: 6px;
+                font-size: 0.88rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                max-height: 290px;
+                overflow-y: auto;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-wrapper table tc code {
+                white-space: nowrap;
+                display: inline-block;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.83rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: var(--title);
+                padding: 7px 10px;
+                border-bottom: 2px solid var(--card-border);
+                font-weight: 700;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #edf2f7;
+                color: var(--text);
+            }
+
+            tr:nth-child(even) {
+                background-color: #fafcff;
+            }
+
+            .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <h1>Homework 3</h1>
+        </header>
+
+        <div class="main-container">
+            <div class="card">
+                <h2 class="card-title">Adversarial Penetration Modeling: Bernoulli and Rademacher Processes</h2>
+                <div class="card-content">
+                    <p>In an enterprise network composed of <em>n</em> distinct systems, the sequence of attack attemps executed by <em>m</em> independent adversaries is modeled as a discrete-time stochastic process.</p>
+                    <p>Let the random variable <code>X<sub>i,j</sub></code> be the incremental penetration score achieved on the <em>i</em>-th system (<code>i &in; {1, 2, ..., <em>n</em>}</code>) by the <em>j</em>-th adversary (<code>j &in; {1, 2, ..., <em>m</em>}</code>). <br>
+                        It is assumed that for each adversary the increments <code>{X<sub>1,j</sub>, X<sub>2,j</sub>, ..., X<sub><em>n</em>,j</sub>}</code> are independent and identically distributed random variables drawn from a common probability distribution.<br/>
+                        The cumulative score after testing <em>k</em> systems (<code>k &le; <em>n</em></code>) represents a random walk trajectory: 
+                        <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                            \( S_{k,j} = \sum_{i=1}^{k} X_{i,j} \)
+                        </span>.
+                    </p>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle" style="margin-top: 32px; margin-bottom: 12px;">The Bernoulli Model</h3>
+                        <p class="stat-text">In the Bernoulli Model, each increment variable is binary <code>X<sub>i</sub> &in; {0, 1}</code>, with probability mass function:
+                            <ul>
+                                <li><code>P(X<sub>i</sub> = 1) = p</code>, where <code>X<sub>i</sub> = 1</code> denotes a successful attack;</li>
+                                <li><code>P(X<sub>i</sub> = 0) = 1 - p</code>, where <code>X<sub>i</sub> = 0</code> denotes an uncompromised system.</li>
+                            </ul>
+                            The cumulative score <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                            \( S_{n} = \sum_{i=1}^{n} X_{i} \)
+                        </span> is the <strong>simple random walk with parameter <em>p</em></strong>, which represents the total count of compromised systems, following a <em>binomial distribution</em> <strong>Binomial(<em>n, p</em>)</strong> with <strong>theoretical mean</strong> <code>&mu; = &#x1D53C;[X<sub>i</sub>] = p</code> and <strong>variance</strong> <code>&sigma;<sup>2</sup> = Var(X<sub>i</sub>) = p(1 - p)</code>.<br/>
+                            Since all increments are non-negative, the <strong>penetration trajectory</strong> is <strong>monotonic non-decreasing</strong> (<code>S<sub>k+1</sub> &GreaterEqual; S<sub>k</sub></code>), modeling an <strong>asymmetric environment</strong> where the <em>defender canno patch or recover a system once it has been compromised</em>. 
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">The Rademacher Model</h3>
+                        <p class="stat-text">
+                            In the Rademacher Model, increments are <strong>symmetric</strong> and <strong>bipolar</strong>, taking values <code>X<sub>i</sub> &in; {-1, 1}</code> with equal probability <code>P(X<sub>i</sub> = 1) = P(X<sub>i</sub> = -1) = 1/2</code>, where <code>X<sub>i</sub> = 1</code> denotes an adversarial successfull attack, while <code>X<sub>i</sub> = -1</code> denotes an uncompromised system.<br/>
+                            This model produces a classical <strong>one-dimensional random walk centered at zero</strong>, with a <strong>theoretical mean</strong> <code>&mu; = &#x1D53C;[X<sub>i</sub>] = 0</code> and <strong>variance</strong> <code>&sigma;<sup>2</sup> = Var(X<sub>i</sub>) = 1</code>. It acts as an equilibrium baseline where neither side has an inherent advantage. Hence, the model provides the ideal setting to analyze penetration trajectory, variance scaling and convergence toward the standard normal distribution via the <strong>Central Limit Theorem</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Asymptotic Analysis of Penetration Quantities</h2>
+                <div class="card-content">
+                    <p>
+                        To understand how attack scores behave as the network size <em>n</em> grows, three distinct metrics are compared:
+                        <ul>
+                            <li><strong>Total Score</strong> <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                            \( S_{n} = \sum_{i=1}^{n} X_{i} \)
+                            </span>;</li>
+                            <li><strong>Average Score</strong> <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                            \( S_{n}/n = (1/n)\sum_{i=1}^{n} X_{i} \)
+                            </span>;</li>
+                            <li><strong>Normalized Scaled Score</strong> <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                            \( S_{n}/&radic;n = (1/&radic;n)\sum_{i=1}^{n} X_{i} \)
+                            </span>.</li>   
+                        </ul> 
+                        The difference among these metrics lies in how each factor affects the variance and the distribution profile as <code><em>n</em> &rightarrow; &infin;</code>.
+                    </p>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle" style="margin-top: 32px; margin-bottom: 12px;">Variance under Different Normalizations</h3>
+                        <p class="stat-text">
+                            Applying variance properties to sums of independent and identically distributed random variables yields three distinct asymptotic scaling regimes.<br/><br/>
+                            Since the increments are <strong>mutually independent</strong>, the <strong>covariance terms vanish</strong> (<code>Cov(X<sub>i</sub>, X<sub>j</sub>) = 0</code> for <code>i &ne; j</code>), reducing the variance of their sum directly to the <strong>sum of their individual variances</strong>:
+                            <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \operatorname{Var}(S_n) = \operatorname{Var}\left(\sum_{i=1}^{n} X_i\right) = \sum_{i=1}^{n} \operatorname{Var}(X_i) = \sum_{i=1}^{n} \sigma^2 = n\sigma^2 \)
+                            </span>.<br/>
+                            For the <strong>Total Score</strong>, the variance <strong>grows linearly with <em>n</em></strong>. The resulting <strong>standard derivation</strong> <code>SD(S<sub>n</sub>) = &radic;Var(S<sub>n</sub>) = &sigma;&radic;n</code> causes individual attacker trajectories to drift across a spacial interval of order <code>&#x1D4AA;(&radic;n)</code>, reflecting stochastic diffusion.<br/><br/>
+                            When examining the <strong>Average Score</strong>, factoring out the scalar constant <code>1/n</code> squares the denominator: <code>Var(S<sub>n</sub>/n) = (1/n)<sup>2</sup> Var(S<sub>n</sub>) = 1/(n)<sup>2</sup> &middot; (n&sigma;<sup>2</sup>) = &sigma;<sup>2</sup>/n</code>.<br/>
+                            As <em>n</em> grows, the variance decays inversely to zero: 
+                            <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \lim_{n \to \infty} \operatorname{Var}\left(\frac{S_n}{n}\right) = \lim_{n \to \infty} \frac{\sigma^2}{n} = 0 \)
+                            </span>.<br/>
+                            This forces all trajectory averages to compress aroung the expected value <code>𝔼[X<sub>i</sub>]</code>, ensuring deterministic stability.<br/><br/>
+                            For the <strong>Normalized Scalar Score</strong>, scaling by the factor <code>1/&radic;n</code> isolates the exact rate of disperion: 
+                            <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \operatorname{Var}\left(\frac{S_n}{\sqrt{n}}\right) = \operatorname{Var}\left(\frac{1}{\sqrt{n}} S_n\right) = \left(\frac{1}{\sqrt{n}}\right)^2 \operatorname{Var}(S_n) = \frac{1}{n} \cdot (n\sigma^2) = \sigma^2 \)
+                            </span>.<br/>
+                            The variance remains <strong>strictly invariant to the system size <em>n</em></strong>.<br/>
+                            Hence, the variance equals the single-step parameter across all scales: <span style="background: var(--code-bg); padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \operatorname{Var}\left(\frac{S_n}{\sqrt{n}}\right) = \begin{cases} 1 & \text{for the Rademacher model } (\sigma^2 = 1) \\ p(1-p) & \text{for the Bernoulli model } (\sigma^2 = p(1-p)) \end{cases} \)
+                            </span>.
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Convergence in Probability of S<sub>n</sub>/n according to the Law of Large Numbers</h3>
+                        <p class="stat-text">
+                            According to the <strong>Law of Large Numbers</strong>, the <strong>average score</strong> converges in probability to the expected value <code>&mu;</code> as <em>n</em> increases:
+                            <span style="background: var(--code-bg); padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \mathbb{E}\left[\frac{S_n}{n}\right] = \mathbb{E}\left[\frac{1}{n}\sum_{i=1}^n X_i\right] = \frac{1}{n} \sum_{i=1}^n \mathbb{E}[X_i] = \frac{1}{n} (n\mu) = \mu \implies \frac{S_n}{n} \xrightarrow{\mathbb{P}} \mu \quad \text{as } n \to \infty \)
+                            </span>. <br/>
+                            Evaluating this limit under the two models yields:
+                            <span style="background: var(--code-bg); padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \lim_{n \to \infty} \frac{S_n}{n} = \begin{cases} p & \text{for the Bernoulli model } (\mu = p, \, \sigma^2 = p(1-p)) \\ 0 & \text{for the Rademacher model } (\mu = 0, \, \sigma^2 = 1) \end{cases} \)
+                            </span>.<br/><br/>
+                            In cybersecurity terms, this proofs that stochastic operational noise cancels out across large infrastructures: the average compromise rate stabilized at the underlying system vulnerability parameter rather than fluctuating with the attacker luck. 
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Convergence in Distribution of S<sub>n</sub>/&radic;n according to the Central Limit Theorem</h3>
+                        <p class="stat-text">
+                            According to the <strong>Central Limit Theorem</strong>, the sums of independent increments converge toward a <strong>Gaussian distribution</strong>. Since the <strong>Rademacher model</strong> naturally has a zero mean and a unit variance, the <strong>Normalized Scaled Score</strong> converges to a <strong>standard normal distribution</strong>:
+                            <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \frac{S_n - np}{\sqrt{n p(1 - p)}} \xrightarrow{d} \mathcal{N}(0, 1) \)
+                            </span>.<br/>
+                            For large <em>n</em> values, plotting the outcomes of multiple attackers produces the <strong>Gaussial bell curve</strong><br/><br/>
+                            In the <strong>Bernoulli model</strong>, since the mean is non-zero, the <strong>Normalized Scalar Score</strong> drifts upward by <code>p&radic;n</code>.<br/>
+                            Standardizing to
+                            <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \mathcal{N}(0, 1) \)
+                            </span> requires centering around the mean:
+                            <span style="background: var(--code-bg); padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.9em; display: inline-block;">
+                                \( \frac{S_n - np}{\sqrt{n p(1 - p)}} \xrightarrow{d} \mathcal{N}(0, 1), \quad \frac{S_n}{\sqrt{n}} \xrightarrow{d} \mathcal{N}(0, 1) \quad \text{as } n \to \infty \)
+                            </span>.                            
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Interactive Asymptotic Simulation</h2>
+                <div class="card-content">
+                    <p>
+                        Empirical validation of trajectory dynamics, the Law of Large Numbers (LLN), and the Central Limit Theorem (CLT) across user-defined parameter scales.
+                    </p>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 20px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; align-items: end;">
+                        <div>
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">Model:</label>
+                            <select id="simModel" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-size: 0.9em;">
+                                <option value="rademacher">Rademacher (Symmetric)</option>
+                                <option value="bernoulli">Bernoulli (Asymmetric)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">Metric Scale:</label>
+                            <select id="simScale" style="width: 100%; padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-size: 0.9em;">
+                                <option value="normalized">Scaled: S_k / &radic;k (CLT)</option>
+                                <option value="average">Average: S_k / k (LLN)</option>
+                                <option value="raw">Raw: S_k (Diffusion)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">Steps (n): <span id="valN" style="font-weight: 700; color: #2563eb;">100</span></label>
+                            <input type="range" id="paramN" min="20" max="300" value="100" step="10" style="width: 100%;">
+                        </div>
+
+                        <div>
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">Trajectories (m): <span id="valM" style="font-weight: 700; color: #2563eb;">80</span></label>
+                            <input type="range" id="paramM" min="10" max="250" value="80" step="5" style="width: 100%;">
+                        </div>
+
+                        <div id="probContainer" style="display: none;">
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">Probability (p): <span id="valP" style="font-weight: 700; color: #2563eb;">0.50</span></label>
+                            <input type="range" id="paramP" min="0.05" max="0.95" value="0.50" step="0.05" style="width: 100%;">
+                        </div>
+
+                        <div>
+                            <button id="btnRunSim" style="width: 100%; background: #2563eb; color: #ffffff; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                                Run Simulation
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                            <div style="font-size: 0.9em; font-weight: 600; color: #334155; margin-bottom: 8px;">Stochastic Trajectories (k = 1 ... n)</div>
+                            <canvas id="trajCanvas" width="520" height="300" style="width: 100%; height: auto; display: block;"></canvas>
+                        </div>
+
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                            <div style="font-size: 0.9em; font-weight: 600; color: #334155; margin-bottom: 8px;">Final Terminal Distribution vs Theory</div>
+                            <canvas id="histCanvas" width="360" height="300" style="width: 100%; height: auto; display: block;"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Observations</h3>
+                        <p class="stat-text">
+                            <ul>
+                                <li><strong>Trajectory Dynamics</strong>: under <strong>Total Score S<sub>n</sub></strong>, trajectory display spatial expansion proportional to <code>&#119978;(&radic;n)</code>. When switching to the <strong>Average Score S<sub>n</sub>/n</strong>, early fluctuations rapidly compress toward the expected value, verifying the <strong>Law of Large Numbers</strong>. Under the <strong>Normalized Scaled Score S<sub>n</sub>/&radic;n</strong>, the trajectory maintains constant variance across all step indices.</li>
+                                <li><strong>Terminal Distribution</strong>: the histogram at step <code>k = n</code> shows the final scores of all <em>m</em> simulated attackers. Under the <strong>Normalized Scalar Score</strong>, the shape of bars closely matches the theoretical Gaussian curve (red line), providing a visual proof of the <strong>Central Limit Theorem</strong>.</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>   
+            
+            <div class="card">
+                <h2 class="card-title">Cybersecurity Context</h2>
+                <div class="card-content">
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Role of Infrastructure Scale (<em>n</em>)</h3>
+                        <p class="stat-text">
+                            <ul>
+                                <li><strong>Total Successfull Attacks (S<sub>n</sub>)</strong>: in the <strong>Bernoulli model</strong>, the average number of compromised systems grows linearly as <code>&#120124;[S<sub>n</sub>] = np</code>, while the spread increases at a slow rate of <code>&#119978;(&radic;n)</code>. Hence, <strong>larger networks will naturally suffer more total successfull attacks</strong>, even if every individual system has the same level of security.</li>
+                                <li><strong>Elimination of Luck (S<sub>n</sub>/n)</strong>: according to the <strong>Law of Large Numbers</strong>, the average breach rate gets closer to the vulnerability level <em>p</em> as <em>n</em> grows. Since the variance tends to zero, an attacker's luck vanishes over a large network. <strong>The final successfull attacks rate reflects the actual quality of the defenses</strong> rather than random chance.</li>
+                                <li><strong>Predictable Risk (S<sub>n</sub>/&radic;n)</strong>: according to the <strong>Central Limit Theorem</strong>, the normalized scalar score follow a standard <strong>Gaussian bell curve</strong>. This allows <strong>security analysts to easily calculate worst-case probabilities</strong> (such as high-impact events) using a <strong>standard normal distribution</strong>, without having to calculate every individual combination by hand.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Role of Attacker Volume (<em>m</em>)</h3>
+                        <p class="stat-text">
+                            <ul>
+                                <li><strong>Testing the Full Attack Surface</strong>: testing just 1 attacker (<code><em>m</em> = 1</code>) gives a single random result that can be very misleading. Testing how many attackers fill out the graph shows all possible outcomes, making the final histogram match the theoretical Gaussian bell curve.</li>
+                                <li><strong>Worst-Case vs. Average Risk</strong>: even if the average success rate is <em>p</em>, having many attackers means that some will get exponentially lucky and score higher than the average. In cybersecurity, defenders cannot only focus on the average attack, but they must build defenses strong enough to stop the worst-case attack found, which is the attack with maximum S<sub>n</sub>.</li>
+                            </ul>
+                        </p>
+                    </div>
+
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Model Comparison: Bernoulli vs. Rademacher</h3>
+                        <p class="stat-text">
+                            <ul>
+                                <li><strong>Defensive Dynamics</strong>: in the <strong>Bernoulli model</strong>, breaches are permanent. In other words, once a system is compromised, it stays that way since there is no fix or recovery during the test. In the <strong>Rademacher model</strong>, there is a live contest between attack and defense since an attacker's win can be canceled out by a security patch or response.</li>
+                                <li><strong>Average Score</strong>: in the <strong>Bernoulli model</strong>, the average score moves toward the baseline success rate <em>p</em>. In the <strong>Rademacher model</strong>, the average score is 0, since wins and losses happen with equal chance.</li>
+                                <li><strong>Variance and Spread</strong>: in the <strong>Bernoulli model</strong>, the risk variance is controlled by <code>p(1 - p)</code>, reaching its peak at <code>p = 0.5</code> (<code>&sigma;<sup>2</sup> = 0.25</code>) and dropping close to 0 if defenses are either nearly impenetrable (low p) or completely broken (high p). In the <strong>Rademacher model</strong>, every step has a fixed variance of 1, leading to a wider spread of trajectories over time.</li>
+                            </ul>
+                        </p>
+                    </div>
+
+                    
+                </div>
+            </div>
+            <section class="card">
+                <h2 class="card-title">References</h2>
+                <div class="card-content">
+                    <ol style="padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.93rem; color: var(--text);">
+                        <li>
+                            <strong>Feller, W.</strong> 
+                            <a href="https://archive.org/details/dli.ernet.5666/page/n6/mode/1up" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">
+                                <em>An Introduction to Probability Theory and Its Applications</em>
+                            </a>, Vol. 1. John Wiley &amp; Sons.
+                        </li>
+                        <li>
+                            <strong>Grimmett, G., &amp; Stirzaker, D.</strong> 
+                            <a href="https://global.oup.com/academic/product/probability-and-random-processes-9780198847595" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">
+                                <em>Probability and Random Processes</em>
+                            </a>. Oxford University Press.
+                        </li>
+                        <li>
+                            <strong>National Institute of Standards and Technology (NIST).</strong> 
+                            <a href="https://csrc.nist.gov/publications/detail/sp/800-115/final" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">
+                                <em>Special Publication 800-115: Technical Guide to Information Security Testing and Assessment</em>
+                            </a>. U.S. Department of Commerce.
+                        </li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                // Riferimenti agli elementi UI
+                const elModel = document.getElementById("simModel");
+                const elScale = document.getElementById("simScale");
+                const elN = document.getElementById("paramN");
+                const elM = document.getElementById("paramM");
+                const elP = document.getElementById("paramP");
+                const probContainer = document.getElementById("probContainer");
+
+                const valN = document.getElementById("valN");
+                const valM = document.getElementById("valM");
+                const valP = document.getElementById("valP");
+                const btnRun = document.getElementById("btnRunSim");
+
+                // Canvas e contesti 2D
+                const trajCanvas = document.getElementById("trajCanvas");
+                const histCanvas = document.getElementById("histCanvas");
+                const ctxTraj = trajCanvas.getContext("2d");
+                const ctxHist = histCanvas.getContext("2d");
+
+                // Mostra il selettore di probabilità solo per il modello di Bernoulli
+                function toggleProbabilityControl() {
+                    if (elModel.value === "bernoulli") {
+                        probContainer.style.display = "block";
+                    } else {
+                        probContainer.style.display = "none";
+                    }
+                }
+
+                // Event Listeners
+                elModel.addEventListener("change", () => {
+                    toggleProbabilityControl();
+                    runSimulation();
+                });
+
+                elScale.addEventListener("change", runSimulation);
+
+                elN.addEventListener("input", () => {
+                    valN.textContent = elN.value;
+                    runSimulation();
+                });
+
+                elM.addEventListener("input", () => {
+                    valM.textContent = elM.value;
+                    runSimulation();
+                });
+
+                elP.addEventListener("input", () => {
+                    valP.textContent = parseFloat(elP.value).toFixed(2);
+                    runSimulation();
+                });
+
+                btnRun.addEventListener("click", runSimulation);
+
+                // Motore Principale della Simulazione
+                function runSimulation() {
+                    const n = parseInt(elN.value, 10);
+                    const m = parseInt(elM.value, 10);
+                    const p = parseFloat(elP.value);
+                    const model = elModel.value;
+                    const scale = elScale.value;
+
+                    const trajectories = [];
+                    const finalValues = [];
+
+                    // Generazione delle m traiettorie
+                    for (let j = 0; j < m; j++) {
+                        const path = [0]; // step 0: S_0 = 0
+                        let cumulative = 0;
+
+                        for (let k = 1; k <= n; k++) {
+                            let step = 0;
+                            if (model === "bernoulli") {
+                                step = Math.random() < p ? 1 : 0;
+                            } else {
+                                step = Math.random() < 0.5 ? 1 : -1;
+                            }
+                            cumulative += step;
+
+                            // Calcolo in base alla metrica selezionata
+                            let val = cumulative;
+                            if (scale === "average") {
+                                val = cumulative / k;
+                            } else if (scale === "normalized") {
+                                val = cumulative / Math.sqrt(k);
+                            }
+                            path.push(val);
+                        }
+                        trajectories.push(path);
+                        finalValues.push(path[n]);
+                    }
+
+                    drawTrajectories(trajectories, n);
+                    drawHistogram(finalValues, model, scale, n, p);
+                }
+
+                // Rendering del grafico delle traiettorie (Canvas 1)
+                function drawTrajectories(trajectories, n) {
+                    ctxTraj.clearRect(0, 0, trajCanvas.width, trajCanvas.height);
+                    const w = trajCanvas.width;
+                    const h = trajCanvas.height;
+                    const pad = { top: 20, right: 20, bottom: 35, left: 45 };
+
+                    // Calcolo estremi Y
+                    let minY = Infinity;
+                    let maxY = -Infinity;
+                    trajectories.forEach(path => {
+                        for (let i = 1; i <= n; i++) {
+                            if (path[i] < minY) minY = path[i];
+                            if (path[i] > maxY) maxY = path[i];
+                        }
+                    });
+
+                    if (minY === maxY) { minY -= 1; maxY += 1; }
+                    const rangeY = (maxY - minY) * 1.1 || 2;
+                    const midY = (maxY + minY) / 2;
+                    const yMinBound = midY - rangeY / 2;
+                    const yMaxBound = midY + rangeY / 2;
+
+                    const mapX = (k) => pad.left + (k / n) * (w - pad.left - pad.right);
+                    const mapY = (val) => pad.top + ((yMaxBound - val) / (yMaxBound - yMinBound)) * (h - pad.top - pad.bottom);
+
+                    // Griglia orizzontale ed etichette asse Y
+                    ctxTraj.strokeStyle = "#e2e8f0";
+                    ctxTraj.lineWidth = 1;
+                    ctxTraj.beginPath();
+                    for (let g = 0; g <= 4; g++) {
+                        const gy = pad.top + (g / 4) * (h - pad.top - pad.bottom);
+                        ctxTraj.moveTo(pad.left, gy);
+                        ctxTraj.lineTo(w - pad.right, gy);
+
+                        const labelVal = yMaxBound - (g / 4) * (yMaxBound - yMinBound);
+                        ctxTraj.fillStyle = "#64748b";
+                        ctxTraj.font = "10px sans-serif";
+                        ctxTraj.textAlign = "right";
+                        ctxTraj.fillText(labelVal.toFixed(1), pad.left - 6, gy + 3);
+                    }
+                    ctxTraj.stroke();
+
+                    // Linea dello Zero (se presente all'interno del frame visivo)
+                    const zeroY = mapY(0);
+                    if (zeroY >= pad.top && zeroY <= h - pad.bottom) {
+                        ctxTraj.strokeStyle = "#94a3b8";
+                        ctxTraj.lineWidth = 1.2;
+                        ctxTraj.setLineDash([4, 4]);
+                        ctxTraj.beginPath();
+                        ctxTraj.moveTo(pad.left, zeroY);
+                        ctxTraj.lineTo(w - pad.right, zeroY);
+                        ctxTraj.stroke();
+                        ctxTraj.setLineDash([]);
+                    }
+
+                    // Disegno delle singole traiettorie semitrasparenti
+                    ctxTraj.lineWidth = 1.1;
+                    trajectories.forEach(path => {
+                        ctxTraj.strokeStyle = "rgba(37, 99, 235, 0.25)";
+                        ctxTraj.beginPath();
+                        ctxTraj.moveTo(mapX(1), mapY(path[1]));
+                        for (let k = 2; k <= n; k++) {
+                            ctxTraj.lineTo(mapX(k), mapY(path[k]));
+                        }
+                        ctxTraj.stroke();
+                    });
+
+                    // Etichette assi
+                    ctxTraj.fillStyle = "#475569";
+                    ctxTraj.font = "11px sans-serif";
+                    ctxTraj.textAlign = "center";
+                    ctxTraj.fillText("Step (k)", (w + pad.left) / 2, h - 10);
+                }
+
+                // Rendering dell'Istogramma e della Gaussiana teorica (Canvas 2)
+                function drawHistogram(data, model, scale, n, p) {
+                    ctxHist.clearRect(0, 0, histCanvas.width, histCanvas.height);
+                    const w = histCanvas.width;
+                    const h = histCanvas.height;
+                    const pad = { top: 20, right: 15, bottom: 35, left: 35 };
+
+                    const numBins = 15;
+                    let min = Math.min(...data);
+                    let max = Math.max(...data);
+                    if (min === max) { min -= 1; max += 1; }
+
+                    const binWidth = (max - min) / numBins;
+                    const bins = new Array(numBins).fill(0);
+
+                    data.forEach(val => {
+                        let b = Math.floor((val - min) / binWidth);
+                        if (b >= numBins) b = numBins - 1;
+                        bins[b]++;
+                    });
+
+                    const maxCount = Math.max(...bins, 1);
+                    const mapX = (val) => pad.left + ((val - min) / (max - min)) * (w - pad.left - pad.right);
+                    const mapY = (cnt) => pad.top + ((maxCount - cnt) / maxCount) * (h - pad.top - pad.bottom);
+
+                    // Barre dell'istogramma empirico
+                    ctxHist.fillStyle = "rgba(99, 102, 241, 0.45)";
+                    ctxHist.strokeStyle = "#4f46e5";
+                    ctxHist.lineWidth = 1;
+
+                    for (let i = 0; i < numBins; i++) {
+                        const x1 = mapX(min + i * binWidth);
+                        const x2 = mapX(min + (i + 1) * binWidth);
+                        const y = mapY(bins[i]);
+                        const barW = Math.max(x2 - x1 - 1, 1);
+                        const barH = (h - pad.bottom) - y;
+
+                        ctxHist.fillRect(x1, y, barW, barH);
+                        ctxHist.strokeRect(x1, y, barW, barH);
+                    }
+
+                    // Calcolo dei parametri teorici per la curva asintotica normale
+                    let mean = 0;
+                    let variance = 1;
+                    if (model === "rademacher") {
+                        mean = 0;
+                        variance = scale === "normalized" ? 1 : (scale === "average" ? 1 / n : n);
+                    } else {
+                        mean = scale === "normalized" ? Math.sqrt(n) * p : (scale === "average" ? p : n * p);
+                        variance = scale === "normalized" ? p * (1 - p) : (scale === "average" ? (p * (1 - p)) / n : n * p * (1 - p));
+                    }
+
+                    const sd = Math.sqrt(variance);
+                    if (sd > 0.0001) {
+                        ctxHist.strokeStyle = "#dc2626";
+                        ctxHist.lineWidth = 2;
+                        ctxHist.beginPath();
+
+                        const stepPixel = 2;
+                        let first = true;
+                        for (let px = pad.left; px <= w - pad.right; px += stepPixel) {
+                            const xVal = min + ((px - pad.left) / (w - pad.left - pad.right)) * (max - min);
+                            const pdf = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((xVal - mean) / sd, 2));
+                            const expectedCount = pdf * binWidth * data.length;
+                            const py = mapY(expectedCount);
+
+                            if (first) {
+                                ctxHist.moveTo(px, py);
+                                first = false;
+                            } else {
+                                ctxHist.lineTo(px, py);
+                            }
+                        }
+                        ctxHist.stroke();
+                    }
+
+                    // Etichetta Asse X
+                    ctxHist.fillStyle = "#475569";
+                    ctxHist.font = "11px sans-serif";
+                    ctxHist.textAlign = "center";
+                    ctxHist.fillText("Terminal Value", (w + pad.left) / 2, h - 10);
+                }
+
+                // Inizializzazione al caricamento
+                toggleProbabilityControl();
+                runSimulation();
+            });
+        </script>
+    </body>
+</html>
