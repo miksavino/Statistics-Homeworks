@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <title>Homework 5</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 980px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+            .sim-layout {
+                display: grid;
+                grid-template-columns: 420px 1fr;
+                gap: 24px;
+                align-items: start;
+                margin-top: 18px;
+            }
+
+            @media (max-width: 960px) {
+                .sim-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .canvas-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            canvas {
+                background-color: #050b18;
+                border: 2px solid #1e293b;
+                border-radius: 8px;
+                width: 100%;
+                max-width: 420px;
+                aspect-ratio: 1 / 1;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.12);
+            }
+
+            .canvas-legend {
+                width: 100%;
+                max-width: 420px;
+                background-color: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                padding: 8px 12px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px 12px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.78rem;
+                color: var(--text-secondary);
+            }
+
+            .legend-item strong {
+                color: var(--title);
+                font-family: monospace;
+            }
+
+            .legend-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                border: 1.5px solid #ffffff;
+                flex-shrink: 0;
+            }
+
+            .details-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            /* Riga controlli orizzontale compatta */
+            .calc-grid {
+                display: flex;
+                align-items: flex-end;
+                gap: 8px;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .control-group label {
+                font-weight: 600;
+                font-size: 0.76rem;
+                color: var(--title);
+                white-space: nowrap;
+            }
+
+            select, input[type="number"] {
+                padding: 4px 6px;
+                font-size: 0.82rem;
+                border: 1px solid var(--card-border);
+                border-radius: 5px;
+                background-color: var(--code-bg);
+                color: var(--text);
+                outline: none;
+                height: 32px;
+            }
+
+            select:focus, input[type="number"]:focus {
+                border-color: var(--button-primary);
+            }
+
+            #selectG {
+                width: 100px;
+            }
+
+            #inputPrivKey {
+                width: 58px;
+            }
+
+            #inputMessage {
+                width: 54px;
+            }
+
+            button {
+                padding: 0 10px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+                height: 32px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            button.btn-primary {
+                background-color: var(--button-primary);
+                color: #ffffff;
+            }
+
+            button.btn-primary:hover:not(:disabled) {
+                background-color: var(--other-buttons);
+            }
+
+            button.btn-secondary {
+                background-color: #e2e8f0;
+                color: var(--text);
+            }
+
+            button.btn-secondary:hover:not(:disabled) {
+                background-color: #cbd5e1;
+            }
+
+            .result-summary {
+                background-color: #f0fdf4;
+                border: 1px solid #86efac;
+                color: #14532d;
+                padding: 9px 12px;
+                border-radius: 6px;
+                font-size: 0.88rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                max-height: 290px;
+                overflow-y: auto;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-wrapper table tc code {
+                white-space: nowrap;
+                display: inline-block;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.83rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: var(--title);
+                padding: 7px 10px;
+                border-bottom: 2px solid var(--card-border);
+                font-weight: 700;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #edf2f7;
+                color: var(--text);
+            }
+
+            tr:nth-child(even) {
+                background-color: #fafcff;
+            }
+
+            .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <h1>Homework 5</h1>
+        </header>
+
+        <div class="main-container">
+            <div class="card">
+                <h2 class="card-title">Exercise 1 - Riemann and Lebesgue Integration</h2>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Riemann Integration</h3>
+                    <p class="stat-text">
+                        The <strong>Riemann integral</strong> ia a mathematical tool used to calculate the area under the curve of a function over a closed interval <code>[a, b]</code>.<br/>
+                        The core idea is to approximate an irregular shape by summing up rectangles.<br/>
+                        This is achieved partitioning the interval [a, b] into <em>n</em> smaller subintervals <code>[x<sub>k-1</sub>, x<sub>k</sub>]</code>, each with a width of <code>&Delta;x<sub>k</sub> = x<sub>k</sub> - x<sub>k-1</sub></code>.<br/>
+                        On each subinterval, we pick a sample point <code>&xi;<sub>k</sub></code> and we draw a rectangle where the base is the subinterval width &Delta;x<sub>k</sub> and the height is the value of the function at the chosen point, <code><em>f</em>(&xi;<sub>k</sub>)</code>. Hence, the area of each rectangle is: <code>Area<sub>k</sub> = <em>f</em>(&xi;<sub>k</sub>) &middot; &Delta;x<sub>k</sub></code>.<br/>
+                        Summing the areas of all rectangles gives an approximation of the total area, known as <strong>Riemann sum</strong>: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$(\sum_{k=1}^n f(\xi_k) \Delta x_k)$$
+                        </span>.<br/>
+                        To find the exact area, we make rectangles thinner by letting the width of the largest subinterval approach zero (<code>max &Delta;x<sub>k</sub> &rightarrow; 0</code>). If thee sum converges to a single unique number, the function is called <strong>Riemann-integrable</strong>, and the limiting value is the definite integral: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$(\int_a^b f(x) \, dx = \lim_{\max \Delta x_k \to 0} \sum_{k=1}^n f(\xi_k) \Delta x_k)$$
+                        </span>. <br/>
+                        It naturally works for continuous or piecewise continuous functions. However, since this method relies on splitting the x-axis into contiguous intervals, it requires the function to be smooth: when the function oscillates violently or is discontinuous almost everywhere, the rectange cannot settle on a consistent height, cause the Riemann integration to fail.
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Lebesgue Integration</h3>
+                    <p class="stat-text">
+                        The <strong>Lebesgue integral</strong> is an advanced method of integration introduced to overcome the limitations of the Riemann integral.<br/>
+                        Instead of dividing the x-axis, the Lebesgue approach focuses on partitioning the y-axis into smaller slices <code>[y<sub>k-1</sub>, y<sub>k</sub>)</code>. For each slice, we find all points <em>x</em> in the domain that produce a value inside that slice: <code>E<sub>k</sub> = {x : y<sub>k-1</sub> ≤ <em>f</em>(x) < y<sub>k</sub>}</code>. Unlike the contiguous intervals in Riemann integration, the sets E<sub>k</sub> can be scattered, fractured or disconnected across the domain.<br/>
+                        We calculate the "size" of each set E<sub>k</sub> using the <strong>Lebesgue measure</strong> <code>&mu;(E<sub>k</sub>)</code>, that generalizes the concept of length, and build an approximation by summing the area of all slices, taking a representative value <code>y<sup>*</sup><sub>k</sub></code> for each slice multiplied by the measure of its set: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$\sum_{k} y_k^* \cdot \mu(E_k)$$
+                        </span>.<br/>
+                        As the slices become infinitely thin <code>max &Delta;y<sub>k</sub> &rightarrow; 0</code>, this sum converges to the <strong>Lebesgue integral</strong>: <code>&Integral;<em>f</em> d&mu;</code>.<br/>
+                        This approach successfully integrates functions with infiinite or dense discontinuities since it only cares about the total measure of the sets where values occur. 
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Interactive Comparison: Riemann vs Lebesgue</h3>
+                    <p class="stat-text">
+                        Select a function to compare the two integration methods. 
+                    </p>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 18px 0; display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: end;">
+                        <div>
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">Function f(x):</label>
+                            <select id="funcSelect" style="width: 100%; padding: 7px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; font-size: 0.9em;">
+                                <option value="sin">f(x) = sin(x), x ∈ [0, π]</option>
+                                <option value="x2">f(x) = x², x ∈ [0, 1]</option>
+                                <option value="step">f(x) = 1 (x < 0.5) else 3, x ∈ [0, 1]</option>
+                                <option value="abs">f(x) = |x - 0.5|, x ∈ [0, 1]</option>
+                                <option value="invsqrt">f(x) = 1/√x, x ∈ (0, 1]</option>
+                                <option value="sinc">f(x) = sin(x)/x, x ∈ [0, π]</option>
+                                <option value="dirichlet">f(x) = 1 if x ∈ ℚ else 0 (Dirichlet)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85em; font-weight: 600; color: #475569; margin-bottom: 4px;">
+                                Subintervals / Slices (N): <span id="valN" style="font-weight: 700; color: #2563eb;">20</span>
+                            </label>
+                            <input type="range" id="paramN" min="4" max="150" value="20" step="2" style="width: 100%;">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                            <div style="font-size: 0.88em; font-weight: 600; color: #334155; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                                <span>Riemann: Domain Partitioning</span>
+                                <span style="color: #2563eb;">N Vertical Strips</span>
+                            </div>
+                            <canvas id="riemannCanvas" width="450" height="260" style="width: 100%; height: auto; display: block; border-radius: 4px; background: #fafafa;"></canvas>
+                        </div>
+
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                            <div style="font-size: 0.88em; font-weight: 600; color: #334155; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                                <span>Lebesgue: Range Partitioning</span>
+                                <span style="color: #059669;">N Horizontal Slices</span>
+                            </div>
+                            <canvas id="lebesgueCanvas" width="450" height="260" style="width: 100%; height: auto; display: block; border-radius: 4px; background: #fafafa;"></canvas>
+                        </div>
+                    </div>
+                    <div style="margin-top: 18px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                        <table style="width: 100%; font-size: 0.88rem; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; color: #475569;">
+                                    <th style="padding: 8px;">Method</th>
+                                    <th style="padding: 8px; text-align: right;">Resolution</th>
+                                    <th style="padding: 8px; text-align: right;">Computed Value</th>
+                                    <th style="padding: 8px; text-align: right;">Analytical Value</th>
+                                    <th style="padding: 8px; text-align: right;">Absolute Error</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 8px; font-weight: 600; color: #2563eb;">Riemann (Midpoint)</td>
+                                    <td id="tableRiemannPart" style="padding: 8px; text-align: right; font-family: monospace;">N = 20</td>
+                                    <td id="resRiemann" style="padding: 8px; text-align: right; font-family: monospace; font-weight: 700; color: #2563eb;">--</td>
+                                    <td id="resExact1" style="padding: 8px; text-align: right; font-family: monospace;">--</td>
+                                    <td id="errRiemann" style="padding: 8px; text-align: right; font-family: monospace; color: #64748b;">--</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; font-weight: 600; color: #059669;">Lebesgue (Range Slices)</td>
+                                    <td id="tableLebesguePart" style="padding: 8px; text-align: right; font-family: monospace;">N = 20</td>
+                                    <td id="resLebesgue" style="padding: 8px; text-align: right; font-family: monospace; font-weight: 700; color: #059669;">--</td>
+                                    <td id="resExact2" style="padding: 8px; text-align: right; font-family: monospace;">--</td>
+                                    <td id="errLebesgue" style="padding: 8px; text-align: right; font-family: monospace; color: #64748b;">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div id="pathologyNote" style="margin-top: 10px; font-size: 0.82rem; color: #b91c1c; display: none;"></div>
+                    </div>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Statistical Analysis</h3>
+                    <ul>
+                        <li><strong>Accuracy</strong> &rightarrow; For smooth continuous functions (such as <code>sin(x)</code> or <code>x<sup>2</sup></code>) the Riemann integration achieves higher precision at low resolutions, while Lebesgue approach yields a wider numerical variance. However, on step functions Lebesgue yields immediately measures with zero approximation error.</li>
+                        <li><strong>Convergence</strong> &rightarrow; Riemann approach shows a convergence of <code>&#x1D4AA;(1/N<sup>2</sup>)</code>, meaning that error drops by a factor 100 when partition density increases by 10.<br/>
+                            Lebesgue approach shows a convergence of <code>&#x1D4AA;(1/N)</code>.<br/>
+                            On every bounded function on which it is possible to apply both methods, results converge to the exact same analytical limit as <code>N &rightarrow; &infin;</code>.
+                        </li>
+                        <li><strong>Computational Efficiency</strong> &rightarrow; Lebesgue approach is computationally more expensive than the Riemann method: since computers cannot invert arbitrary functions analitically, calculating the measure of set &mu;(E<sub>k</sub>) requires testing thousands of sample points across the function domain, sorting them into bins, and counting them up. As a result, the Lebesgue method takes more memory and processing time.</li>
+                    </ul>
+                    <br/>
+                    <p class="stat-text">In general, Riemann integration is faster and more accurate for standard calculus, while Lebesgue approach provides theoretical consistency across discontinuous and singular domains, where Riemann fails.</p>
+                </div>        
+            </div>
+
+            <div class="card">
+                <h2 class="card-title"> Exercise 2 - Numerical Computation of the Normal CDF</h2>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Theoretical Background</h3>
+                    <p class="stat-text">
+                        The <strong>Cumulative Distribution Function</strong> (<strong>CDF</strong>, denoted as <code>F<sub>X</sub>(x)</code>) of a normal random variable <code>X &sim; N(0, 1)</code> measures the probability that X takes value less than or equal to x: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$F_{X}(x) = \mathbb{P}(X \le x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^x e^{-t^2/2} \, dt$$
+                        </span>.<br/>
+                        Since the integrand is symmetric around 0, we get: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$F_{X}(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^0 e^{-t^2/2} \, dt + \frac{1}{\sqrt{2\pi}} \int_0^x e^{-t^2/2} \, dt = \frac{1}{2} + \frac{1}{\sqrt{2\pi}} \int_0^x e^{-t^2/2} \, dt$$
+                        </span>.<br/>
+                        The total area under the curve equals 1, while the left tail up to 0 evaluates to 1/2.
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Liouville's Theorem</h3>
+                    <p class="stat-text">
+                        Typically, in calcusus it possible to find closed-form antiderivatives for common functions using combinations of polynomials, roots, trigonometric functions, logarithms, and exponentials, also called <strong>elementary functions</strong>.<br/>
+                        However, the Gaussian integrand <code>e<sup>-t<sup>2</sup>/2</code> has no elementary antiderivative.<br/>
+                        This is proven by <strong>Liouville's Theorem on Integration in Finite Terms</strong>.<br/>
+                        Liouville proved that an integral on the form <code>&Integral;f(t)e<sup>g(t)</sup> dt</code>, where <em>f</em> and <em>g</em> are rational functions and <em>g</em> is non-constant, can be expressed in terms of elementary functions if and only if exists a rational function <code>R(t)</code> that satisfies the differential equation: <code>f(t) = R'(t) + R(t) &middot; g'(t)</code>.<br/><br/>
+                        For <code>&Integral;e<sup>-t<sup>2</sup>/2</sup> dt</code>, we have <code>f(t) = 1, g(t) = -t<sup>2</sup>/2, g'(t) = -t</code>.<br/>
+                        Substituting these functions into Liouville's condition, we have: <code>1 = R'(t) -t &middot; R(t)</code>.<br/>
+                        If <code>R(t)</code> is a polynomial function with degree <em>n</em>, taking the derivative reduces the degree by 1, so the degree of R'(t) is <em>n-1</em>. Multiplying by t increases the degree by 1, so the degree of (-t &middot; R(t)) is <em>n+1</em>.<br/>
+                        In (R'(t) - t &middot; R(t)), the highest power of t comes from the second term, which has degree <em>n+1</em>. Since R'(t) only has degree <em>n-1</em>, it has no term with degree <em>n+1</em> that could cancel it out.
+                        Since the right side is the constant 1 (with degree 0), to make <code>n + 1 = 0</code>, we need <code>n = -1</code>, but a non-zero polynomial cannot have a negative degree. Hence, R(t) cannot be a polynomial.<br/>
+                        Suppose now <code>R(t) = P(t)/Q(t)</code>, where P(t) and Q(t) are polynomials that share no common factors, and Q(t) has a root t<sub>0</sub>, meaning <code>Q(t<sub>0</sub>) = 0</code>.<br/>
+                        If Q(t) has a root of multiplicity <code>m &GreaterEqual; 1</code>, then R(t) has a pole of order <em>m</em> at t<sub>0</sub>. Differentiating increases the order of the pole by 1, so R'(t) blows up near t<sub>0</sub> with an order of <em>m+1</em>. Multiplying by t, does not change the roots of the denominator, so (-t &middot; R(t)) still has a pole of order <em>m</em>.<br/>
+                        In (R'(t) - t &middot; R(t)), the dominant blow-up comes from R'(t) since the term -tR(t) is too weak to cancel out this singularity.<br/>
+                        As <code>t &rightarrow; t<sub>0</sub></code>, the left side blows up to infinity, while the right side is the constant 1, which never blows up.<br/>
+                        Hence, Q(t) cannot have any roots, meaning that Q(t) must be a constant, which brings us back to the polynomial case, which is already been proved as impossible.<br/><br/>   
+                        Consequently, since R(t) cannot be a polynomial and cannot have a denominator with roots, no rational function R(t) exists that satisfies Liouville's equation. As a result, evaluating CDF analytically using elementary functions is mathematically impossible.
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Error Function erf</h3>
+                    <p class="stat-text">
+                        To provide CDF a mathematical identity despide the absence of elementary functions, mathematicians introduced a special trascendental function, called <strong>error function</strong> (<strong>erf</strong>): <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$\text{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x e^{-u^2} \, du$$
+                        </span>.<br/>
+                        It is possible to map the normal CDF directly to erf(x) using a change of variables:
+                        <ul>
+                            <li>let <code>u = t/&radic;2</code>, which means <code>t = u&radic;2</code> and <code>dt = &radic;2 du</code>;</li>
+                            <li>the limits of integration change from <code>t &in; [0,x]</code> to <code>u &in; [0,x/&radic;2]</code>;</li>
+                            <li>substituting into the integral gives <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                $$\frac{1}{\sqrt{2\pi}} \int_0^x e^{-t^2/2} \, dt = \frac{1}{\sqrt{2\pi}} \int_0^{x/\sqrt{2}} e^{-u^2} \sqrt{2} \, du = \frac{1}{\sqrt{\pi}} \int_0^{x/\sqrt{2}} e^{-u^2} \, du = \frac{1}{2} \, \text{erf}\left(\frac{x}{\sqrt{2}}\right)$$
+                            </span> </li>
+                        </ul>
+                        Combining this with the area of the left half (1/2), we achieve the closed analytical representation: <code>F<sub>X</sub>(x) = &frac12;[1 + erf(x/&radic;2)]</code>.
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Why Numerical Methods are still Required</h3>
+                    <p class="stat-text">
+                        While the error functions provides a standardized mathematical definition, <code>erf(x)</code> is not an arithmetic formula and computers only perform basic arithmetic operations (addition, subtraction, multiplication, and division).<br/>
+                        Since erf(x) has not elementary closed form, computing it on a machine still demands numerical techniques, such as:
+                        <ul>
+                            <li><strong>Numerical Quadrature</strong> (<strong>Simpson's Rule</strong> or <strong>Trapezoidal Rule</strong>) &rightarrow; Integrating the area using parabolic interpolations.</li>
+                            <li><strong>Power Series Expansion</strong> &rightarrow; expanding the exponential into an infinite Taylor polynomial and integrating term by term.</li>
+                            <li><strong>Rational Polynomial Approximation</strong> &rightarrow; using optimized formulas (like the <strong>Abramowitz & Stegun Approximations</strong>) designed to minimize error and execution time.</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Exercise 2 - Method Implementation</h2>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Hybrid Method</h3>
+                    <p class="stat-text">Computing the CDF of a standard normal distribution with uniform accuracy has distinct numerical challenges:
+                        <ul>
+                            <li><strong>Limitations of the Taylor Series</strong> &rightarrow; While this approach converges rapidly near the origin, for larger vales (<code>|x| > 2.2</code>) the series suffers from catastrophic cancellation.</li>
+                            <li><strong>Limitations of the Laplace Continued Fraction</strong> &rightarrow; The continued fraction is stable and computationally efficient for large values, but converges slowly near 0.</li>
+                        </ul>
+                        To overcome these complementary issues, it is designed an hybrid algorithm:
+                        <ul>
+                            <li>By the reflection symmetry of the standard normal density, evaluations for negative arguments reduce to <code>F<sub>X</sub>(x) = 1 - F<sub>X</sub>(-x)</code>.</li>
+                            <li>If <code> 0 ≤ x ≤ 2.2</code>, using the relation <code>F<sub>X</sub>(x) = &frac12;[1 + erf(x/&radic;2)]</code>, the error function is expanded into its power series. To prevent floating-point overflow and minimize overhead, consecutive terms are calculated via the recursive relation <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$T_k = -T_{k-1} \cdot \frac{x^2}{2k} \cdot \frac{2k-1}{2k+1} \quad \text{for } k \ge 1$$
+                                </span>.
+                                The iteration terminates as soon as <code>|T<sub>k</sub>| < 10<sup>-16</sup></code>, achieving a good accuracy in at most 24 steps.<br/>
+                            As a result, <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                $$F_{X}(x) = \frac{1}{2} + \frac{1}{\sqrt{\pi}} \sum_{k=0}^{K} T_k$$
+                            </span>
+                            </li>
+                            <li>If <code>x > 2.2</code>, instead of calculating the entire area from the left, it is easier to compute the small area on the right and subtract it from 1. To do this, <strong>Laplace Continued Fraction</strong> (fractions nested inside fractions) is used. To be efficient, the algorithm starts at the 20th level of the cascade and works its way back to the top through basic divisions.   
+                                As a result, 
+                                <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                $$F_{X}(x) = 1 - \frac{1}{\sqrt{2\pi}} \frac{e^{-x^2/2}}{\mathcal{F}_M(x)}$$
+                            </span>.</li>
+                        </ul> 
+                    </p>
+                </div>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; max-width: 620px; font-family: system-ui, -apple-system, sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin: 20px 0;">
+                    <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; color: #1e293b;">Standard Normal CDF Calculator (\(\Phi(x)\))</h3>
+                    
+                    <label for="cdf-input-x" style="display: block; font-size: 0.9rem; font-weight: 600; color: #475569; margin-bottom: 6px;">
+                        Enter value for x:
+                    </label>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+                        <input 
+                            type="number" 
+                            id="cdf-input-x" 
+                            value="1.96" 
+                            step="0.01" 
+                            style="flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; outline: none;"
+                        />
+                        <button 
+                            type="button" 
+                            id="cdf-calc-btn" 
+                            style="background: #2563eb; color: #ffffff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;">
+                            Compute \(\Phi(x)\)
+                        </button>
+                    </div>
+
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
+                        <span style="font-size: 0.8rem; color: #64748b; align-self: center; margin-right: 4px;">Presets:</span>
+                        <button type="button" class="preset-btn" data-val="-3.00" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">-3.00</button>
+                        <button type="button" class="preset-btn" data-val="-1.96" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">-1.96</button>
+                        <button type="button" class="preset-btn" data-val="0.00" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">0.00</button>
+                        <button type="button" class="preset-btn" data-val="1.00" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">+1.00</button>
+                        <button type="button" class="preset-btn" data-val="1.96" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">+1.96</button>
+                        <button type="button" class="preset-btn" data-val="2.576" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">+2.576</button>
+                        <button type="button" class="preset-btn" data-val="3.00" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-size: 0.8rem; cursor: pointer;">+3.00</button>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="color: #64748b;">Computed \(\Phi(x)\):</span>
+                            <strong id="res-val" style="font-family: monospace; font-size: 1.05rem; color: #0f172a;">0.9750021048517795</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="color: #64748b;">Evaluated Branch:</span>
+                            <span id="res-branch" style="font-weight: 500; color: #1e293b;">Recursive Taylor Series</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748b;">Operations / Depth:</span>
+                            <span id="res-steps" style="color: #334155;">19 iterations</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Accuracy Analysys</h3>
+                    <p class="stat-text">
+                        To validate reliability of the hybrid algorithm, it is tested across key critical points of the standard normal distribution. The computed values are compared to high-precision reference values.
+                    </p>
+                    <div style="overflow-x: auto; margin: 20px 0;">
+                        <table style="width: 100%; border-collapse: collapse; font-family: system-ui, -apple-system, sans-serif; font-size: 0.9rem; text-align: left; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <thead>
+                                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #334155;">
+                                    <th style="padding: 12px 16px; font-weight: 600;">x</th>
+                                    <th style="padding: 12px 16px; font-weight: 600;">Computed F<sub>X</sub>(x)</th>
+                                    <th style="padding: 12px 16px; font-weight: 600;">Reference Value</th>
+                                    <th style="padding: 12px 16px; font-weight: 600;">Absolute Error</th>
+                                    <th style="padding: 12px 16px; font-weight: 600;">Relative Error</th>                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(-3.00\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.0013498980316301</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.0013498980316301</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.1 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 8.2 &times; 10<sup>-14</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9; background: #fbfcfe;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(-2.576\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.0049970921096116</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.0049970921096116</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.0 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 2.0 &times; 10<sup>-14</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(-1.96\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.0249978951482204</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.0249978951482204</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.0 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 4.1 &times; 10<sup>-15</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9; background: #fbfcfe;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(-1.00\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.1586552539314570</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.1586552539314570</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.1 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 7.0 &times; 10<sup>-16</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(0.00\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.5000000000000000</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.5000000000000000</td>
+                                    <td style="padding: 10px 16px; font-family: monospace; font-weight: 600; color: #16a34a;">0.0 (Exact)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace; font-weight: 600; color: #16a34a;">0.0 (Exact)</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9; background: #fbfcfe;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(+1.00\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.8413447460685430</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.8413447460685430</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.1 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.4 &times; 10<sup>-16</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(+1.96\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9750021048517795</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9750021048517795</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.1 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.2 &times; 10<sup>-16</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9; background: #fbfcfe;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(+2.576\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9950029078903884</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9950029078903884</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.0 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.1 &times; 10<sup>-16</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(+3.00\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9986501019683699</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9986501019683699</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.1 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.2 &times; 10<sup>-16</sup></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #f1f5f9; background: #fbfcfe;">
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(+5.00\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9999997133484281</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">0.9999997133484281</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.0 &times; 10<sup>-16</sup></td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">&lt; 1.0 &times; 10<sup>-16</sup></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 16px; font-weight: 600;">\(+8.50\)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">1.0000000000000000</td>
+                                    <td style="padding: 10px 16px; font-family: monospace;">1.0000000000000000</td>
+                                    <td style="padding: 10px 16px; font-family: monospace; font-weight: 600; color: #16a34a;">0.0 (Exact)</td>
+                                    <td style="padding: 10px 16px; font-family: monospace; font-weight: 600; color: #16a34a;">0.0 (Exact)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="stat-text">Across all test points, the maximum absolute error remains bounded by 1.1&middot;10<sup>-16</sup>.</p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Computational Efficiency</h3>
+                    <p class="stat-text">
+                        <ul>
+                            <li>For <code>0 ≤ x ≤ 2.2</code>, the algorithm does not evaluate <code>Math.exp()</code>, replacing exponential evaluations with standard multiplications and additions. The iterations are at most 24 (for x = 2.2), and each step requires 3 multiplications and 2 divisions, avoiding computation of factorials or powers.</li>
+                            <li>For <code>x > 2.2</code>, the recurrence of Laplace Continued Fraction executes exactly 20 iterations, performing exactly 20 additions and 20 divisions.</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+
+            <section class="card">
+                <h2 class="card-title">References</h2>
+                <div class="card-content">
+                    <ol style="padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.93rem; color: var(--text);">
+                        <li>Università di Bologna. <em>L'Integrale di Riemann: Introduzione</em>. Progetto Matematica. <a href="https://progettomatematica.dm.unibo.it/IntegraleRiemann/intro.html" target="_blank" rel="noopener">https://progettomatematica.dm.unibo.it/IntegraleRiemann/intro.html</a></li>
+                        <li>Melrose, R. B. (2014). <em>Chapter 2: Lebesgue Measure and Integration</em>. MIT Course 18.102. <a href="https://math.mit.edu/~rbm/18-102-S14/Chapter2.pdf" target="_blank" rel="noopener">https://math.mit.edu/~rbm/18-102-S14/Chapter2.pdf</a></li>
+                        <li>StatProofBook. <em>Cumulative distribution function of the standard normal distribution</em>. <a href="https://statproofbook.github.io/P/norm-cdf.html" target="_blank" rel="noopener">https://statproofbook.github.io/P/norm-cdf.html</a></li>
+                        <li>Gardner, R. <em>Section 3.4: The Normal Distribution (Notes on Hogg, McKean, Craig)</em>. East Tennessee State University. <a href="https://faculty.etsu.edu/gardnerr/4047/notes-Hogg-McKean-Craig/Hogg-McKean-Craig-3-4.pdf" target="_blank" rel="noopener">https://faculty.etsu.edu/gardnerr/4047/notes-Hogg-McKean-Craig/Hogg-McKean-Craig-3-4.pdf</a></li>
+                        <li>Abramowitz, M., &amp; Stegun, I. A. (1964). <em>Handbook of Mathematical Functions with Formulas, Graphs, and Mathematical Tables</em>. National Bureau of Standards (Applied Mathematics Series 55), Chapters 7 &amp; 26.</li>
+                        <li>Press, W. H., Teukolsky, S. A., Vetterling, W. T., &amp; Flannery, B. P. (2007). <em>Numerical Recipes: The Art of Scientific Computing</em> (3rd ed.). Cambridge University Press, Chapter 6.</li>
+                        <li>Higham, N. J. (2002). <em>Accuracy and Stability of Numerical Algorithms</em> (2nd ed.). Society for Industrial and Applied Mathematics (SIAM).</li>
+                        <li>Goldberg, D. (1991). What Every Computer Scientist Should Know About Floating-Point Arithmetic. <em>ACM Computing Surveys</em>, 23(1), 5–48.</li>
+                    </ol>
+                </div>
+            </section>
+        </div>        
+    </body>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const selFunc = document.getElementById("funcSelect");
+            const sliderN = document.getElementById("paramN");
+            const lblN = document.getElementById("valN");
+
+            const rCanvas = document.getElementById("riemannCanvas");
+            const lCanvas = document.getElementById("lebesgueCanvas");
+            const rCtx = rCanvas.getContext("2d");
+            const lCtx = lCanvas.getContext("2d");
+
+            const outRiemann = document.getElementById("resRiemann");
+            const outLebesgue = document.getElementById("resLebesgue");
+            const outExact1 = document.getElementById("resExact1");
+            const outExact2 = document.getElementById("resExact2");
+            const outErrR = document.getElementById("errRiemann");
+            const outErrL = document.getElementById("errLebesgue");
+            const tableN = document.getElementById("tableRiemannPart");
+            const tableM = document.getElementById("tableLebesguePart");
+            const pathologyNote = document.getElementById("pathologyNote");
+
+            function isRationalApprox(x, maxDenom = 60) {
+                let h1 = 1, h0 = 0, k1 = 0, k0 = 1, b = x;
+                do {
+                    let a = Math.floor(b);
+                    let aux = h1; h1 = a * h1 + h0; h0 = aux;
+                    aux = k1; k1 = a * k1 + k0; k0 = aux;
+                    b = 1 / (b - a);
+                } while (Math.abs(x - h1 / k1) > 1e-5 && k1 <= maxDenom);
+                return (k1 <= maxDenom && Math.abs(x - h1 / k1) < 1e-4);
+            }
+
+            const functions = {
+                sin: {
+                    a: 0, b: Math.PI, exact: 2.0, isPathological: false,
+                    f: (x) => Math.sin(x)
+                },
+                x2: {
+                    a: 0, b: 1, exact: 1 / 3, isPathological: false,
+                    f: (x) => x * x
+                },
+                step: {
+                    a: 0, b: 1, exact: 2.0, isPathological: false,
+                    f: (x) => (x < 0.5 ? 1.0 : 3.0)
+                },
+                abs: {
+                    a: 0, b: 1, exact: 0.25, isPathological: false,
+                    f: (x) => Math.abs(x - 0.5)
+                },
+                invsqrt: {
+                    a: 0.001, b: 1, exact: 1.93674, isPathological: false,
+                    f: (x) => 1 / Math.sqrt(Math.max(x, 1e-4))
+                },
+                sinc: {
+                    a: 1e-5, b: Math.PI, exact: 1.851937, isPathological: false,
+                    f: (x) => (x === 0 ? 1 : Math.sin(x) / x)
+                },
+                dirichlet: {
+                    a: 0, b: 1, exact: 0.0, isPathological: true,
+                    f: (x) => (isRationalApprox(x) ? 1.0 : 0.0)
+                }
+            };
+
+            function updateAll() {
+                const fKey = selFunc.value;
+                const N = parseInt(sliderN.value, 10);
+
+                lblN.textContent = N;
+                tableN.textContent = `N = ${N}`;
+                tableM.textContent = `N = ${N}`;
+
+                const cfg = functions[fKey];
+                const a = cfg.a;
+                const b = cfg.b;
+
+                const dx = (b - a) / N;
+                let riemannSum = 0;
+                const rRects = [];
+                for (let i = 0; i < N; i++) {
+                    const xMid = a + (i + 0.5) * dx;
+                    const h = cfg.f(xMid);
+                    riemannSum += h * dx;
+                    rRects.push({ xLeft: a + i * dx, xRight: a + (i + 1) * dx, h: h });
+                }
+
+                const nMesh = 3000;
+                const dxMesh = (b - a) / nMesh;
+                let sampleYMin = Infinity, sampleYMax = -Infinity;
+                const meshValues = new Float64Array(nMesh);
+
+                for (let i = 0; i < nMesh; i++) {
+                    const x = a + (i + 0.5) * dxMesh;
+                    const y = cfg.f(x);
+                    meshValues[i] = y;
+                    if (y < sampleYMin) sampleYMin = y;
+                    if (y > sampleYMax) sampleYMax = y;
+                }
+
+                if (sampleYMin === sampleYMax) sampleYMax = sampleYMin + 1;
+                const dy = (sampleYMax - sampleYMin) / N;
+                const binCounts = new Int32Array(N);
+
+                for (let i = 0; i < nMesh; i++) {
+                    let bin = Math.floor((meshValues[i] - sampleYMin) / dy);
+                    if (bin >= N) bin = N - 1;
+                    if (bin < 0) bin = 0;
+                    binCounts[bin]++;
+                }
+
+                let lebesgueSum = 0;
+                const lSlices = [];
+                for (let j = 0; j < N; j++) {
+                    const yMid = sampleYMin + (j + 0.5) * dy;
+                    const measure = (binCounts[j] / nMesh) * (b - a);
+                    lebesgueSum += yMid * measure;
+                    lSlices.push({
+                        y0: sampleYMin + j * dy,
+                        y1: sampleYMin + (j + 1) * dy,
+                        measure: measure
+                    });
+                }
+
+                if (cfg.isPathological) {
+                    outRiemann.textContent = "Undefined (Oscillates)";
+                    outExact1.textContent = "Does not exist";
+                    outExact2.textContent = "0.0000";
+                    outErrR.textContent = "N/A";
+                    outLebesgue.textContent = lebesgueSum.toFixed(4);
+                    outErrL.textContent = Math.abs(lebesgueSum - cfg.exact).toFixed(4);
+                    pathologyNote.style.display = "block";
+                    pathologyNote.innerHTML = "<strong>Pathological Case:</strong> The Dirichlet function is not Riemann-integrable because upper Darboux sums equal 1 and lower sums equal 0. Under Lebesgue's measure theory, the set of rationals has measure zero (μ(ℚ)=0), yielding the exact integral of 0.";
+                } else {
+                    pathologyNote.style.display = "none";
+                    outRiemann.textContent = riemannSum.toFixed(4);
+                    outLebesgue.textContent = lebesgueSum.toFixed(4);
+                    outExact1.textContent = cfg.exact.toFixed(4);
+                    outExact2.textContent = cfg.exact.toFixed(4);
+                    outErrR.textContent = Math.abs(riemannSum - cfg.exact).toFixed(5);
+                    outErrL.textContent = Math.abs(lebesgueSum - cfg.exact).toFixed(5);
+                }
+
+                drawRiemannView(cfg, rRects, sampleYMin, sampleYMax);
+                drawLebesgueView(cfg, lSlices, sampleYMin, sampleYMax, meshValues, nMesh);
+            }
+
+            function drawAxes(ctx, w, h, pad, a, b, yMin, yMax) {
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = "#cbd5e1";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b);
+
+                ctx.fillStyle = "#64748b";
+                ctx.font = "10px monospace";
+                ctx.textAlign = "center";
+                ctx.fillText(a.toFixed(2), pad.l, h - pad.b + 14);
+                ctx.fillText(b.toFixed(2), w - pad.r, h - pad.b + 14);
+
+                ctx.textAlign = "right";
+                ctx.fillText(yMin.toFixed(1), pad.l - 4, h - pad.b);
+                ctx.fillText(yMax.toFixed(1), pad.l - 4, pad.t + 10);
+            }
+
+            function drawRiemannView(cfg, rects, yMin, yMax) {
+                const w = rCanvas.width, h = rCanvas.height;
+                const pad = { t: 15, r: 15, b: 25, l: 35 };
+                const a = cfg.a, b = cfg.b;
+                const effYMin = Math.min(0, yMin);
+                const effYMax = yMax * 1.05;
+
+                drawAxes(rCtx, w, h, pad, a, b, effYMin, effYMax);
+
+                const mapX = (x) => pad.l + ((x - a) / (b - a)) * (w - pad.l - pad.r);
+                const mapY = (y) => pad.t + ((effYMax - y) / (effYMax - effYMin)) * (h - pad.t - pad.b);
+                const yZero = mapY(0);
+
+                rects.forEach(r => {
+                    const x0 = mapX(r.xLeft);
+                    const x1 = mapX(r.xRight);
+                    const yH = mapY(r.h);
+                    const rw = Math.max(x1 - x0, 1);
+
+                    rCtx.fillStyle = "rgba(37, 99, 235, 0.25)";
+                    rCtx.fillRect(x0, Math.min(yZero, yH), rw, Math.abs(yZero - yH));
+                    rCtx.strokeStyle = "rgba(37, 99, 235, 0.8)";
+                    rCtx.strokeRect(x0, Math.min(yZero, yH), rw, Math.abs(yZero - yH));
+                });
+
+                if (!cfg.isPathological) {
+                    rCtx.strokeStyle = "#1e293b";
+                    rCtx.lineWidth = 1.8;
+                    rCtx.beginPath();
+                    const steps = 300;
+                    for (let i = 0; i <= steps; i++) {
+                        const x = a + (i / steps) * (b - a);
+                        const y = cfg.f(x);
+                        const px = mapX(x);
+                        const py = mapY(y);
+                        if (i === 0) rCtx.moveTo(px, py);
+                        else rCtx.lineTo(px, py);
+                    }
+                    rCtx.stroke();
+                }
+            }
+
+            function drawLebesgueView(cfg, slices, yMin, yMax, meshValues, nMesh) {
+                const w = lCanvas.width, h = lCanvas.height;
+                const pad = { t: 15, r: 15, b: 25, l: 35 };
+                const a = cfg.a, b = cfg.b;
+                const effYMin = Math.min(0, yMin);
+                const effYMax = yMax * 1.05;
+
+                drawAxes(lCtx, w, h, pad, a, b, effYMin, effYMax);
+
+                const mapX = (x) => pad.l + ((x - a) / (b - a)) * (w - pad.l - pad.r);
+                const mapY = (y) => pad.t + ((effYMax - y) / (effYMax - effYMin)) * (h - pad.t - pad.b);
+
+                slices.forEach((sl, idx) => {
+                    const yTop = mapY(sl.y1);
+                    const yBot = mapY(sl.y0);
+                    const sh = Math.abs(yBot - yTop);
+
+                    lCtx.fillStyle = idx % 2 === 0 ? "rgba(16, 185, 129, 0.08)" : "rgba(16, 185, 129, 0.16)";
+                    lCtx.fillRect(pad.l, yTop, w - pad.l - pad.r, sh);
+
+                    lCtx.strokeStyle = "rgba(16, 185, 129, 0.35)";
+                    lCtx.beginPath();
+                    lCtx.moveTo(pad.l, yTop);
+                    lCtx.lineTo(w - pad.r, yTop);
+                    lCtx.stroke();
+                });
+
+                const dxMesh = (b - a) / nMesh;
+                lCtx.fillStyle = "#059669";
+                for (let i = 0; i < nMesh; i += 3) {
+                    const x = a + (i + 0.5) * dxMesh;
+                    const y = meshValues[i];
+                    const px = mapX(x);
+                    const py = mapY(y);
+                    lCtx.fillRect(px - 1, py - 1, 2, 2);
+                }
+            }
+
+            selFunc.addEventListener("change", updateAll);
+            sliderN.addEventListener("input", updateAll);
+
+            updateAll();
+        });
+    </script>
+
+    <script>
+        function developedNormalCDF(x) {
+            if (isNaN(x)) return { value: NaN, branch: "Invalid input", steps: 0 };
+            if (x === 0) {
+                return { value: 0.5, branch: "Symmetry Identity (x = 0)", steps: 0 };
+            }
+
+            const isNegative = x < 0;
+            const absX = Math.abs(x);
+
+            if (absX > 8.0) {
+                const val = isNegative ? 0.0 : 1.0;
+                return {
+                    value: val,
+                    branch: isNegative ? "Tail Saturation (underflow)" : "Tail Saturation (overflow)",
+                    steps: 0
+                };
+            }
+
+            if (absX <= 2.2) {
+                const z = absX / Math.SQRT2;
+                const z2 = z * z;
+                let term = z;
+                let sum = term;
+                let steps = 0;
+
+                for (let k = 1; k < 60; k++) {
+                    steps = k;
+                    term *= -z2 / k;
+                    const step = term / (2 * k + 1);
+                    sum += step;
+                    if (Math.abs(step) < 1e-16) break;
+                }
+
+                let phi = 0.5 + (sum / Math.sqrt(Math.PI));
+                if (isNegative) phi = 1.0 - phi;
+
+                return {
+                    value: phi,
+                    branch: isNegative ? "Symmetry + Recursive Taylor Series" : "Recursive Taylor Series",
+                    steps: steps + " iterations"
+                };
+            }
+
+            const depth = 20;
+            let f = absX;
+            for (let k = depth; k >= 1; k--) {
+                f = absX + k / f;
+            }
+
+            const tail = Math.exp(-0.5 * absX * absX) / (Math.sqrt(2 * Math.PI) * f);
+            const phi = isNegative ? tail : 1.0 - tail;
+
+            return {
+                value: phi,
+                branch: isNegative ? "Symmetry + Backward Continued Fraction" : "Backward Continued Fraction",
+                steps: depth + " backward levels"
+            };
+        }
+
+        function updateCDF() {
+            const inputEl = document.getElementById("cdf-input-x");
+            const val = parseFloat(inputEl.value);
+            const res = developedNormalCDF(val);
+
+            document.getElementById("res-val").textContent = isNaN(res.value) ? "NaN" : res.value.toFixed(16);
+            document.getElementById("res-branch").textContent = res.branch;
+            document.getElementById("res-steps").textContent = res.steps;
+        }
+
+        document.getElementById("cdf-calc-btn").addEventListener("click", updateCDF);
+
+        document.getElementById("cdf-input-x").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                updateCDF();
+            }
+        });
+
+        document.querySelectorAll(".preset-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.getElementById("cdf-input-x").value = btn.getAttribute("data-val");
+                updateCDF();
+            });
+        });
+    </script>
+</html>
