@@ -1,1 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <title>Homework 6</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 980px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+            .sim-layout {
+                display: grid;
+                grid-template-columns: 420px 1fr;
+                gap: 24px;
+                align-items: start;
+                margin-top: 18px;
+            }
+
+            @media (max-width: 960px) {
+                .sim-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .canvas-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            canvas {
+                background-color: #050b18;
+                border: 2px solid #1e293b;
+                border-radius: 8px;
+                width: 100%;
+                max-width: 420px;
+                aspect-ratio: 1 / 1;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.12);
+            }
+
+            .canvas-legend {
+                width: 100%;
+                max-width: 420px;
+                background-color: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                padding: 8px 12px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px 12px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.78rem;
+                color: var(--text-secondary);
+            }
+
+            .legend-item strong {
+                color: var(--title);
+                font-family: monospace;
+            }
+
+            .legend-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                border: 1.5px solid #ffffff;
+                flex-shrink: 0;
+            }
+
+            .details-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            /* Riga controlli orizzontale compatta */
+            .calc-grid {
+                display: flex;
+                align-items: flex-end;
+                gap: 8px;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .control-group label {
+                font-weight: 600;
+                font-size: 0.76rem;
+                color: var(--title);
+                white-space: nowrap;
+            }
+
+            select, input[type="number"] {
+                padding: 4px 6px;
+                font-size: 0.82rem;
+                border: 1px solid var(--card-border);
+                border-radius: 5px;
+                background-color: var(--code-bg);
+                color: var(--text);
+                outline: none;
+                height: 32px;
+            }
+
+            select:focus, input[type="number"]:focus {
+                border-color: var(--button-primary);
+            }
+
+            #selectG {
+                width: 100px;
+            }
+
+            #inputPrivKey {
+                width: 58px;
+            }
+
+            #inputMessage {
+                width: 54px;
+            }
+
+            button {
+                padding: 0 10px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+                height: 32px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            button.btn-primary {
+                background-color: var(--button-primary);
+                color: #ffffff;
+            }
+
+            button.btn-primary:hover:not(:disabled) {
+                background-color: var(--other-buttons);
+            }
+
+            button.btn-secondary {
+                background-color: #e2e8f0;
+                color: var(--text);
+            }
+
+            button.btn-secondary:hover:not(:disabled) {
+                background-color: #cbd5e1;
+            }
+
+            .result-summary {
+                background-color: #f0fdf4;
+                border: 1px solid #86efac;
+                color: #14532d;
+                padding: 9px 12px;
+                border-radius: 6px;
+                font-size: 0.88rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                max-height: 290px;
+                overflow-y: auto;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-wrapper table tc code {
+                white-space: nowrap;
+                display: inline-block;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.83rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: var(--title);
+                padding: 7px 10px;
+                border-bottom: 2px solid var(--card-border);
+                font-weight: 700;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #edf2f7;
+                color: var(--text);
+            }
+
+            tr:nth-child(even) {
+                background-color: #fafcff;
+            }
+
+            .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <h1>Homework 6</h1>
+        </header>
+
+        <div class="main-container">
+            <div class="card">
+               <h2 class="card-title">Independence in Statistics and Probability</h2> 
+                <div class="card-content">
+                    <p>
+                        In data analysis, we start from a population or sample of N statistical units, organized in a <strong>dataset</strong> where rows represent statistical units and columns represent observed variables. When analyzing two variables - denoted as X and F - at the same time, we build a <strong>bivariate distribution</strong>, represented via a contingency table (or crosstable), where:
+                        <ul>
+                            <li>each cell (<em>i</em>, <em>j</em>) contains the <strong>joint frequency n<sub>ij</sub></strong>, i.e. how many statistical units simultaneously exhibit x<sub>i</sub> and f<sub>i</sub>, or the <strong>relative joint frequency f<sub>ij</sub> = n<sub>ij</sub>/N</strong>.</li>
+                            <li>at the borders of the crosstable, the row totals <code>n<sub>i.</sub> = &sum;<sub>j</sub>n<sub>ij</sub></code> and column totals <code>n<sub>.j</sub> = &sum;<sub>i</sub>n<sub>ij</sub></code> recover the univariate distribution of X and F individually, called <strong>marginal distribution</strong>. Dividing by N gives the <strong>relative marginal frequencies</strong> <code>f<sub>i.</sub> = n<sub>i.</sub>/N</code> and <code>f<sub>.j</sub> = n<sub>.j</sub>/N</code>.</li>
+                        </ul>
+                        Conditioning means restricting the reference total from the entire population to a specific subset defined by a modality of the other variable. The <strong>conditional relative frequency</strong> of x<sub>i</sub> given f<sub>i</sub> is defined as the ratio between the joint frequency and the corresponding marginal frequency: <code>f<sub>i|j</sub> = n<sub>ij</sub>/n<sub>.j</sub> = f<sub>ij</sub>/f<sub>.j</sub></code>.
+                        Simmetrically, the conditional distribution of F given x<sub>i</sub> is <code>f<sub>j|i</sub> = n<sub>ij</sub>/n<sub>i.</sub> = f<sub>ij</sub>/f<sub>i.</sub></code>.
+                    </p>
+                    <p>
+                        In <strong>descriptive statistics</strong>, we deal with known observed counts and distributions without uncertainty. Two statistical variables X and F are <strong>statistically independent</strong> if conditioning on one variable does not alter the distribution shape of the other variable. Formally, every conditional distribution must equal che corresponding marginal distribution: <code>n<sub>ij</sub>/n<sub>.j</sub> = n<sub>i.</sub>/N for each i,j</code>.<br/>
+                        In terms of relative frequencies, independence holds when every joint relative frequency factorizes into the product of its marginal relative frequencies: <code>f<sub>ij</sub> = f<sub>i.</sub> &middot; f<sub>.j</sub></code>. Since multiplication is commutative (<code>f<sub>ij</sub> = f<sub>ji</sub></code>), independence is a <strong>symmetric property</strong>: if F has no influence on X, then X has no influence on F. 
+                    </p>
+                    <p>
+                        In <strong>probability theory</strong>, we deal with an unknown or infinite population. In this case, <strong>Kolmogorov's axiomatic probability space (&Omega;, F, P)</strong> provides the mathematical abstraction of empirical frequencies: relative frequencies correspond to probabilities (f &rightarrow; P).<br/>
+                        Hence, properties that are obtained by counting in descriptive statistics are assumed as formal definitions in probability theory:
+                        <ul>
+                            <li>Two events A, B &in; F are <strong>stochastically independent</strong> if the probability of their inteserction equals the product of their individual properties, i.e. <code>P(A &Intersection; B) = P(A) &middot; P(B)</code>.</li>
+                            <li>Conditioning does not change the probability of the event, i.e. <code>P(A|B) = P(A &Intersection; B)/P(B) = P(A)</code>, with P(B) > 0.</li>
+                        </ul> 
+                    </p>
+                    <p>
+                        The link between the two domains is guaranteed by the <strong>Law of Large Numbers</strong>: as the sample size N &rightarrow; &infin;, empirical relative frequencies f<sub>ij</sub> converge to their theoretical probabilities P(X = x<sub>i</sub> &Intersection; F = f<sub>i</sub>).
+                    </p>
+                </div> 
+            </div>
+            <div class="card">
+                <h2 class="card-title">Chi-Square χ² and &rho;-value</h2>
+                <div class="card-content">
+                    <p>
+                        In a finite empirical sample of size N, random fluctuations prevent f<sub>ij</sub> from equaling (f<sub>i.</sub> &middot; f<sub>.j</sub>) exactly, even when the two underlying variables are independent.<br/>
+                        Under the hypothesis of independence, the <strong>theoretical expected frequency E<sub>ij</sub></strong> for cell (<em>i</em>, <em>j</em>) is achieved by scaling the product of the marginal relative frequencies by the sample size N: <code>E<sub>ij</sub> = N &middot; (f<sub>i.</sub> &middot; f<sub>.j</sub>) = (n<sub>i.</sub> &middot; n<sub>.j</sub>)/N</code>. The achieved <strong>table of expected frequencies</strong> represents the counts we would observe in an idealized scenario of perfect independence while preserving the empirical row and colums totals.<br/>
+                        To evaluate the discrepancy between the observed table O<sub>ij</sub> and the theoretical expected counts E<sub>ij</sub> across all cells, <strong>Pearson's Chi-square statistic</strong> is computed: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$\chi^2 = \sum_{i=1}^{R} \sum_{j=1}^{C} \frac{(O_{ij} - E_{ij})^2}{E_{ij}}$$
+                        </span>.<br/>
+                        A value of <code>χ² = 0</code> indicates exact empirical independence, while larger values signal stronger departures from it. 
+                        Under the null hypothesis of independence, χ² asymptomatically follows a chi-square distribution with <code><em>v</em> = (R-1) &middot; (C-1)</code> degrees of freedom, i.e. the number of cells free to vary given fixed marginals.<br/> 
+                        From this distribution, we compute the <strong>&rho;-value</strong> as <code>P(χ²<sub><em>v</em></sub> &GreaterEqual; χ²<sub>obs</sub>)</code>, which represents the probability of observing a discrepancy at least as extreme as χ²<sub>obs</sub> purely by chance. If <code>&rho; < &alpha;</code> (where typically <code>&alpha; = 0.05</code>), we conclude that X and F are statistically dependent.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Contingency Table Dynamic Analysis</h2>
+                <div class="card-content">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                        <span style="font-size: 0.84rem; color: #64748b; font-weight: 600;">Presets:</span>
+                        <button type="button" id="preset-dep" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 5px 10px; font-size: 0.82rem; cursor: pointer; color: #1e293b;">
+                            Dependent Dataset
+                        </button>
+                        <button type="button" id="preset-indep" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 5px; padding: 5px 10px; font-size: 0.82rem; cursor: pointer; color: #1e293b;">
+                            Independent Dataset
+                        </button>
+                        <label style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; border-radius: 5px; padding: 5px 10px; font-size: 0.82rem; cursor: pointer; font-weight: 500; margin-left: auto;">
+                            Upload CSV
+                            <input type="file" id="csv-file-input" accept=".csv,.txt" style="display: none;" />
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Variable X</label>
+                            <input type="text" id="new-x" placeholder="e.g. In-Person" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 0.88rem;" />
+                        </div>
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Variable F</label>
+                            <input type="text" id="new-f" placeholder="e.g. Pass" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 0.88rem;" />
+                        </div>
+                        <div style="width: 95px;">
+                            <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Count</label>
+                            <input type="number" id="new-count" value="1" min="1" style="width: 100%; box-sizing: border-box; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 0.88rem;" />
+                        </div>
+                        <button type="button" id="add-pair-btn" style="background: #0f172a; color: #ffffff; border: none; padding: 8px 14px; border-radius: 5px; font-size: 0.86rem; font-weight: 500; cursor: pointer;">
+                            + Add
+                        </button>
+                    </div>
+
+                    <div style="max-height: 210px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 14px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem;">
+                            <thead>
+                                <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; color: #475569; text-align: left;">
+                                    <th style="padding: 8px 12px;">X</th>
+                                    <th style="padding: 8px 12px;">F</th>
+                                    <th style="padding: 8px 12px; width: 100px;">Count</th>
+                                    <th style="padding: 8px 12px; width: 60px; text-align: center;">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pairs-list-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+                        <button type="button" id="run-analysis-btn" style="background: #2563eb; color: #ffffff; border: none; padding: 9px 18px; border-radius: 6px; font-weight: 500; font-size: 0.92rem; cursor: pointer;">
+                            Compute
+                        </button>
+                        <button type="button" id="clear-pairs-btn" style="background: #ffffff; color: #64748b; border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 6px; font-size: 0.86rem; cursor: pointer;">
+                            Clear
+                        </button>
+                        <span id="input-error-msg" style="color: #dc2626; font-size: 0.85rem; font-weight: 500;"></span>
+                    </div>
+
+                    <div id="analysis-output" style="display: none;">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; margin-bottom: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                            <div>
+                                <div style="font-size: 0.78rem; color: #64748b;">Total (N)</div>
+                                <div id="out-n" style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.78rem; color: #64748b;">Chi-Square (&chi;&sup2;)</div>
+                                <div id="out-chi2" style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.78rem; color: #64748b;">Degrees of Freedom</div>
+                                <div id="out-df" style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.78rem; color: #64748b;">p-value</div>
+                                <div id="out-pval" style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: #0f172a;">-</div>
+                            </div>
+                            <div style="grid-column: 1 / -1; border-top: 1px solid #e2e8f0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.85rem; color: #475569;">Result:</span>
+                                <span id="out-decision" style="font-weight: 600; font-size: 0.9rem; padding: 3px 10px; border-radius: 4px;">-</span>
+                            </div>
+                        </div>
+
+                        <h4 style="margin: 16px 0 8px 0; font-size: 0.95rem; color: #1e293b;">Observed &amp; Marginal Frequencies</h4>
+                        <div id="table-observed-container" style="overflow-x: auto; margin-bottom: 18px;"></div>
+
+                        <h4 style="margin: 16px 0 8px 0; font-size: 0.95rem; color: #1e293b;">Conditional Frequencies</h4>
+                        <div id="table-conditional-container" style="overflow-x: auto; margin-bottom: 18px;"></div>
+
+                        <h4 style="margin: 16px 0 8px 0; font-size: 0.95rem; color: #1e293b;">Expected Frequencies</h4>
+                        <div id="table-expected-container" style="overflow-x: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Results and Comparative Analysis</h2>
+                <div class="card-content">
+                    <p>
+                        They are conducted two comparative experiments on bivariate datasets of size N = 200, analyzing <strong>practiced sports</strong> (X) (Football, Tennis, Volleyball) against <strong>attended faculty</strong> (F) (Engineering, Humanities).
+                    </p>
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Dependent Variables</h3>
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h4 style="margin: 0; font-size: 0.98rem; color: #1e293b;">Case A: Sport vs. Engineering / Humanities</h4>
+                                <span style="background: #fee2e2; color: #b91c1c; font-size: 0.78rem; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Dependent (p &lt; 0.05)</span>
+                            </div>
+
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; border: 1px solid #e2e8f0; text-align: center;">
+                                    <thead>
+                                        <tr style="background: #f8fafc; color: #334155;">
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left;">Sport (X) \ Faculty (F)</th>
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0;">Engineering</th>
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0;">Humanities</th>
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0;">Total (n<sub>i&middot;</sub>)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-family: monospace;">
+                                        <tr>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif; font-weight: 600; background: #f8fafc;">Football</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">55 <span style="color: #64748b; font-size: 0.78rem;">(E: 40)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">25 <span style="color: #64748b; font-size: 0.78rem;">(E: 40)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; background: #f1f5f9; font-weight: 600;">80</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif; font-weight: 600; background: #f8fafc;">Tennis</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">35 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">25 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; background: #f1f5f9; font-weight: 600;">60</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif; font-weight: 600; background: #f8fafc;">Volleyball</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">10 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">50 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; background: #f1f5f9; font-weight: 600;">60</td>
+                                        </tr>
+                                        <tr style="background: #f1f5f9; font-weight: 600;">
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif;">Total (n<sub>&middot;j</sub>)</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">100</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">100</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">N = 200</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 0.84rem; font-family: monospace; color: #334155;">
+                                <span>&chi;&sup2; = <strong>39.5833</strong></span>
+                                <span>df = <strong>2</strong></span>
+                                <span>p-value = <strong>2.54e-9</strong></span>
+                            </div>
+                        </div>
+                        <br>
+                        <p class="stat-text">
+                            In the first test, 200 students evenly split between Engineering (n<sub>.1</sub> = 100) and Humanities (n<sub>.2</sub> = 100) are examined, with row totals n<sub>1.</sub> = 80 (Football), n<sub>2.</sub> = 60 (Tennis), and n<sub>3.</sub> = 60 (Volleyball). 
+                            <ul>
+                                <li><strong>Observed vs. Expected</strong> - Under independence, each sport should split 50%/50% across faculties (E<sub>1j</sub> = 40, E<sub>2j</sub> = 30, E<sub>3j</sub> = 30). However, the observed counts diverge.</li>
+                                <li><strong>Conditional Distributions</strong> - The conditional frequencies f(F|X) vary across rows: Engineering accounts fro 68.75% of Football practitioners but only 16.67% of Volleyball players, deviating strongly from the 50% marginal share.</li>
+                                <li><strong>Statistical Decision</strong> - The resulting <code>χ² = 39.5833</code> (with <em>v</em> = 2) yields a <code>&rho;-value = 2.54 &middot; 10<sup>-9</sup></code>. Since <code>&rho;-value < 0.05</code>, it is possible to conclude that X and F are statistically dependent.</li>
+                            </ul>
+                        </p>
+                    </div>
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Independent Variables</h3>
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h4 style="margin: 0; font-size: 0.98rem; color: #1e293b;">Case B: Sport vs. Engineering / Humanities</h4>
+                                <span style="background: #dcfce7; color: #15803d; font-size: 0.78rem; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Independent (p &ge; 0.05)</span>
+                            </div>
+
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; border: 1px solid #e2e8f0; text-align: center;">
+                                    <thead>
+                                        <tr style="background: #f8fafc; color: #334155;">
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left;">Sport (X) \ Faculty (F)</th>
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0;">Engineering</th>
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0;">Humanities</th>
+                                            <th style="padding: 8px 10px; border: 1px solid #e2e8f0;">Total (n<sub>i&middot;</sub>)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-family: monospace;">
+                                        <tr>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif; font-weight: 600; background: #f8fafc;">Football</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">41 <span style="color: #64748b; font-size: 0.78rem;">(E: 40)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">39 <span style="color: #64748b; font-size: 0.78rem;">(E: 40)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; background: #f1f5f9; font-weight: 600;">80</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif; font-weight: 600; background: #f8fafc;">Tennis</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">29 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">31 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; background: #f1f5f9; font-weight: 600;">60</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif; font-weight: 600; background: #f8fafc;">Volleyball</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">30 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">30 <span style="color: #64748b; font-size: 0.78rem;">(E: 30)</span></td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; background: #f1f5f9; font-weight: 600;">60</td>
+                                        </tr>
+                                        <tr style="background: #f1f5f9; font-weight: 600;">
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0; text-align: left; font-family: system-ui, sans-serif;">Total (n<sub>&middot;j</sub>)</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">100</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">100</td>
+                                            <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">N = 200</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 0.84rem; font-family: monospace; color: #334155;">
+                                <span>&chi;&sup2; = <strong>0.1167</strong></span>
+                                <span>df = <strong>2</strong></span>
+                                <span>p-value = <strong>0.9433</strong></span>
+                            </div>
+                        </div>    
+                        <br>
+                        <p class="stat-text">
+                            In the second test, marginal distributions are preserved, so the expected frequencies remain identical.
+                            <ul>
+                                <li><strong>Observed vs. Expected</strong> - The observed counts lie within &PlusMinus;1 unit of the expected values.</li>
+                                <li><strong>Conditional Distributions</strong> - Conditioning on sport leaves the faculty distribution unchanged: both Engineering and Humanities closely match the 50% marginal distribution in each sport.</li>
+                                <li><strong>Statistical Decision</strong> - The accumulating discrepancy is minimal, yielding <code>χ² = 0.1167</code> (with <em>v</em> = 2)</li> and <code>&rho;-value = 0.9433</code>. Since <code>&rho;-value &GreaterEqual; 0.05</code>, X and F are considered statistically independent.
+                            </ul> 
+                        </p>
+                    </div>
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Observation</h3>
+                        <p class="stat-text">
+                            Even in an independent population (Case B), finite samples rarely yield <code>χ² = 0</code>. The &rho;-value provides a formal threshold to distinguish random sampling variability from structural dependence.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Association vs. Causality</h2>
+                <div class="card-content">
+                    <p>
+                       Although case A shows a strong statistical association between sport and faculty, <strong> statistical dependence (association) does not imply causation</strong>.<br/>
+                       Enrolling in a faculty does not causally force a student to choose a sport over the others, nor does practicing a sport cause enrollment in a faculty. <br/><br/>
+                       Contingency tables and Chi-square statistic detect deviations from joint factorization, showing that conditioning on one variable alters the empirical distribution of the other, i.e. <code>f<sub>i|j</sub> &NotEqual; f<sub>i.</sub></code>. However, statistical tools measure only <strong>co-occurence within a dataset</strong>, not the underlying generative or physical mechanism linking the variables.<br/>
+                       In general, an observed statistical dependency between two variables X and F can arise from 4 distinct scenarios:
+                       <ol>
+                            <li>
+                                <strong>Symmetric Nature of Statistical Dependence vs. Asymmetric Causality</strong> - Statistical dependence is strictly symmetric, while causality is <strong>directional and asymmetric</strong> (X &rightarrow; F or F &rightarrow; X). A contingency table alone cannot distinguish whether X influences F, whether F influences X, or whether both mutually influence each other. 
+                            </li>
+                            <li>
+                                <strong>Confounding Factors and Disturbing Variables</strong> - An apparent association between X and F is frequently induced by an unmeasured third variable Z (called <strong>confounder</strong> or <strong>disturbing factor</strong>), that simultaneously influences both X and F. If Z is omitted from the analysis, X and F appear strongly correlated even though no causal link exists between them.  
+                            </li>
+                            <li>
+                                <strong>Sampling Bias and Lack of Representativeness</strong> - Statistical inference from a sample to a broader population is valid only if the sample is <strong>unbiased and representative</strong> with respect to the variables under study. If the data collection procedure introduces bias, artificial associations can emerge depending on how the dataset was constructed.
+                            </li>
+                            <li>
+                                <strong>Observational Analysis vs. Controlled Experiments</strong> - Passively observing a population through a survey reveals existing empirical association, while establishing a causal effect required a <strong>controlled experimental design</strong>. Techniques such as <strong>randomization</strong>, <strong>stratification</strong>, and <strong>blinded control groups</strong> are specifically designed to isolate causal relationships among the variables under study by breaking correlations with confounding variables.
+                            </li>
+                       </ol>
+                       <br>
+                       Hence, while the χ² test provides a rigorous mathematical criterion to identify predictive relationships and structural dependencies in bivariate data, causal claims require domain knowledge, careful control and confounding variables, and dedicated experimental protocols rather than frequency analysis alone. 
+                    </p>
+                </div>
+            </div>
+        </div>        
+    </body>
+
+    <script>
+        let datasetRows = [];
+
+        function renderPairsList() {
+            const tbody = document.getElementById("pairs-list-body");
+            if (datasetRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="padding: 12px; text-align: center; color: #94a3b8;">No data added.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = datasetRows.map((row, idx) => `
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 6px 12px; font-weight: 500; color: #1e293b;">${row.x}</td>
+                    <td style="padding: 6px 12px; color: #334155;">${row.f}</td>
+                    <td style="padding: 6px 12px;">
+                        <input type="number" min="1" value="${row.count}" data-idx="${idx}" class="row-count-input" style="width: 75px; padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace;" />
+                    </td>
+                    <td style="padding: 6px 12px; text-align: center;">
+                        <button type="button" data-idx="${idx}" class="remove-row-btn" style="background: none; border: none; color: #ef4444; font-weight: 700; cursor: pointer; font-size: 0.95rem;">&times;</button>
+                    </td>
+                </tr>
+            `).join("");
+
+            document.querySelectorAll(".row-count-input").forEach(inp => {
+                inp.addEventListener("change", (e) => {
+                    const i = parseInt(e.target.getAttribute("data-idx"), 10);
+                    const val = parseInt(e.target.value, 10);
+                    datasetRows[i].count = val > 0 ? val : 1;
+                });
+            });
+
+            document.querySelectorAll(".remove-row-btn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const i = parseInt(e.target.getAttribute("data-idx"), 10);
+                    datasetRows.splice(i, 1);
+                    renderPairsList();
+                });
+            });
+        }
+
+        function addOrMergePair(x, f, count) {
+            const existing = datasetRows.find(r => r.x === x && r.f === f);
+            if (existing) {
+                existing.count += count;
+            } else {
+                datasetRows.push({ x, f, count });
+            }
+        }
+
+        function upperIncompleteGammaQ(a, x) {
+            if (x < 0 || a <= 0) return NaN;
+            if (x === 0) return 1.0;
+
+            function logGamma(z) {
+                const c = [
+                    76.18009172947146, -86.50532032941677, 24.01409824083091,
+                    -1.231739572450155, 0.001208650973866179, -0.000005395239384953
+                ];
+                let u = z, y = z, tmp = u + 5.5;
+                tmp -= (u + 0.5) * Math.log(tmp);
+                let ser = 1.000000000190015;
+                for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+                return -tmp + Math.log(2.5066282746310005 * ser / u);
+            }
+
+            const gln = logGamma(a);
+
+            if (x < a + 1.0) {
+                let ap = a, del = 1.0 / a, sum = del;
+                for (let n = 1; n <= 120; n++) {
+                    ap += 1.0;
+                    del *= x / ap;
+                    sum += del;
+                    if (Math.abs(del) < Math.abs(sum) * 1e-15) break;
+                }
+                return 1.0 - sum * Math.exp(-x + a * Math.log(x) - gln);
+            }
+
+            let b = x + 1.0 - a, c = 1.0 / 1e-30, d = 1.0 / b, h = d;
+            for (let i = 1; i <= 120; i++) {
+                const an = -i * (i - a);
+                b += 2.0;
+                d = an * d + b;
+                if (Math.abs(d) < 1e-30) d = 1e-30;
+                c = b + an / c;
+                if (Math.abs(c) < 1e-30) c = 1e-30;
+                d = 1.0 / d;
+                const del = d * c;
+                h *= del;
+                if (Math.abs(del - 1.0) < 1e-15) break;
+            }
+            return Math.exp(-x + a * Math.log(x) - gln) * h;
+        }
+
+        function computeFromDatasetRows(rowsData) {
+            let N = 0;
+            for (const r of rowsData) N += r.count;
+            if (N === 0) throw new Error("Dataset is empty.");
+
+            const rows = Array.from(new Set(rowsData.map(p => p.x))).sort();
+            const cols = Array.from(new Set(rowsData.map(p => p.f))).sort();
+            const R = rows.length;
+            const C = cols.length;
+
+            const rMap = Object.fromEntries(rows.map((r, i) => [r, i]));
+            const cMap = Object.fromEntries(cols.map((c, j) => [c, j]));
+
+            const O = Array.from({ length: R }, () => Array(C).fill(0));
+            for (const { x, f, count } of rowsData) {
+                O[rMap[x]][cMap[f]] += count;
+            }
+
+            const rowTotals = O.map(r => r.reduce((a, b) => a + b, 0));
+            const colTotals = cols.map((_, j) => O.reduce((acc, r) => acc + r[j], 0));
+
+            const rowRel = rowTotals.map(v => v / N);
+            const colRel = colTotals.map(v => v / N);
+
+            const condFGivenX = O.map((r, i) => r.map(val => val / rowTotals[i]));
+            const condXGivenF = O.map(r => r.map((val, j) => val / colTotals[j]));
+
+            const E = Array.from({ length: R }, (_, i) =>
+                Array.from({ length: C }, (__, j) => (rowTotals[i] * colTotals[j]) / N)
+            );
+
+            let chi2 = 0;
+            for (let i = 0; i < R; i++) {
+                for (let j = 0; j < C; j++) {
+                    if (E[i][j] > 0) {
+                        chi2 += Math.pow(O[i][j] - E[i][j], 2) / E[i][j];
+                    }
+                }
+            }
+
+            const df = (R - 1) * (C - 1);
+            const pValue = df > 0 ? upperIncompleteGammaQ(df / 2, chi2 / 2) : 1.0;
+
+            return { N, rows, cols, O, rowTotals, colTotals, rowRel, colRel, condFGivenX, condXGivenF, E, chi2, df, pValue };
+        }
+
+        function renderTables(res) {
+            const tblStyle = 'style="width:100%; border-collapse:collapse; font-size:0.86rem; border:1px solid #e2e8f0;"';
+            const thStyle = 'style="padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; text-align:center; color:#334155;"';
+            const tdStyle = 'style="padding:8px 12px; border:1px solid #e2e8f0; text-align:center; font-family:monospace;"';
+            const rowHeaderStyle = 'style="padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; text-align:left; font-weight:600; color:#1e293b;"';
+            const margStyle = 'style="padding:8px 12px; background:#f1f5f9; border:1px solid #e2e8f0; text-align:center; font-family:monospace; font-weight:600;"';
+
+            let htmlObs = `<table ${tblStyle}><thead><tr><th ${thStyle}>X \\ F</th>`;
+            res.cols.forEach(c => htmlObs += `<th ${thStyle}>${c}</th>`);
+            htmlObs += `<th ${thStyle}>Total</th><th ${thStyle}>Marginal</th></tr></thead><tbody>`;
+
+            res.rows.forEach((r, i) => {
+                htmlObs += `<tr><td ${rowHeaderStyle}>${r}</td>`;
+                res.cols.forEach((_, j) => {
+                    htmlObs += `<td ${tdStyle}>${res.O[i][j]} <span style="color:#64748b; font-size:0.78rem;">(${(res.O[i][j] / res.N).toFixed(3)})</span></td>`;
+                });
+                htmlObs += `<td ${margStyle}>${res.rowTotals[i]}</td><td ${margStyle}>${res.rowRel[i].toFixed(4)}</td></tr>`;
+            });
+
+            htmlObs += `<tr><td ${rowHeaderStyle}>Total</td>`;
+            res.colTotals.forEach(ct => htmlObs += `<td ${margStyle}>${ct}</td>`);
+            htmlObs += `<td ${margStyle}>${res.N}</td><td ${margStyle}>1.0000</td></tr>`;
+
+            htmlObs += `<tr><td ${rowHeaderStyle}>Marginal</td>`;
+            res.colRel.forEach(cr => htmlObs += `<td ${margStyle}>${cr.toFixed(4)}</td>`);
+            htmlObs += `<td ${margStyle}>1.0000</td><td ${margStyle}>&mdash;</td></tr></tbody></table>`;
+            document.getElementById("table-observed-container").innerHTML = htmlObs;
+
+            let htmlCond = `<table ${tblStyle}><thead><tr><th ${thStyle}>X \\ F</th>`;
+            res.cols.forEach(c => htmlCond += `<th ${thStyle}>${c}</th>`);
+            htmlCond += `<th ${thStyle}>Sum</th></tr></thead><tbody>`;
+
+            res.rows.forEach((r, i) => {
+                htmlCond += `<tr><td ${rowHeaderStyle}>${r}</td>`;
+                res.cols.forEach((_, j) => {
+                    htmlCond += `<td ${tdStyle}>${res.condFGivenX[i][j].toFixed(4)} <span style="color:#64748b; font-size:0.78rem;">[${res.condXGivenF[i][j].toFixed(4)}]</span></td>`;
+                });
+                htmlCond += `<td ${margStyle}>1.0000</td></tr>`;
+            });
+            htmlCond += `</tbody></table>`;
+            document.getElementById("table-conditional-container").innerHTML = htmlCond;
+
+            let htmlExp = `<table ${tblStyle}><thead><tr><th ${thStyle}>X \\ F</th>`;
+            res.cols.forEach(c => htmlExp += `<th ${thStyle}>${c}</th>`);
+            htmlExp += `<th ${thStyle}>Total</th></tr></thead><tbody>`;
+
+            res.rows.forEach((r, i) => {
+                htmlExp += `<tr><td ${rowHeaderStyle}>${r}</td>`;
+                res.cols.forEach((_, j) => {
+                    htmlExp += `<td ${tdStyle}>${res.E[i][j].toFixed(2)}</td>`;
+                });
+                htmlExp += `<td ${margStyle}>${res.rowTotals[i].toFixed(2)}</td></tr>`;
+            });
+            htmlExp += `</tbody></table>`;
+            document.getElementById("table-expected-container").innerHTML = htmlExp;
+        }
+
+        function runAnalysis() {
+            const errEl = document.getElementById("input-error-msg");
+            const outEl = document.getElementById("analysis-output");
+            errEl.textContent = "";
+
+            try {
+                const res = computeFromDatasetRows(datasetRows);
+
+                document.getElementById("out-n").textContent = res.N;
+                document.getElementById("out-chi2").textContent = res.chi2.toFixed(6);
+                document.getElementById("out-df").textContent = res.df;
+                document.getElementById("out-pval").textContent = res.pValue < 1e-6 ? res.pValue.toExponential(4) : res.pValue.toFixed(6);
+
+                const decEl = document.getElementById("out-decision");
+                if (res.df === 0) {
+                    decEl.textContent = "df = 0";
+                    decEl.style.background = "#f1f5f9";
+                    decEl.style.color = "#475569";
+                } else if (res.pValue < 0.05) {
+                    decEl.textContent = "Dependent (p-value < 0.05)";
+                    decEl.style.background = "#fee2e2";
+                    decEl.style.color = "#b91c1c";
+                } else {
+                    decEl.textContent = "Independent (p-value ≥ 0.05)";
+                    decEl.style.background = "#dcfce7";
+                    decEl.style.color = "#15803d";
+                }
+
+                renderTables(res);
+                outEl.style.display = "block";
+            } catch (e) {
+                errEl.textContent = e.message;
+                outEl.style.display = "none";
+            }
+        }
+
+        document.getElementById("add-pair-btn").addEventListener("click", () => {
+            const xVal = document.getElementById("new-x").value.trim();
+            const fVal = document.getElementById("new-f").value.trim();
+            const cVal = parseInt(document.getElementById("new-count").value, 10);
+            const errEl = document.getElementById("input-error-msg");
+
+            if (!xVal || !fVal) {
+                errEl.textContent = "Enter both X and F.";
+                return;
+            }
+            errEl.textContent = "";
+            addOrMergePair(xVal, fVal, cVal > 0 ? cVal : 1);
+            document.getElementById("new-x").value = "";
+            document.getElementById("new-f").value = "";
+            document.getElementById("new-count").value = "1";
+            renderPairsList();
+        });
+
+        document.getElementById("csv-file-input").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const lines = ev.target.result.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                datasetRows = [];
+                lines.forEach((line, idx) => {
+                    const parts = line.split(/[,;\t]+/).map(s => s.trim());
+                    if (parts.length >= 2 && !(idx === 0 && parts[0].toLowerCase() === "x" && parts[1].toLowerCase() === "f")) {
+                        addOrMergePair(parts[0], parts[1], 1);
+                    }
+                });
+                renderPairsList();
+                runAnalysis();
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById("preset-dep").addEventListener("click", () => {
+            datasetRows = [
+                { x: "In-Person", f: "Fail", count: 20 },
+                { x: "In-Person", f: "Pass", count: 100 },
+                { x: "Online", f: "Fail", count: 30 },
+                { x: "Online", f: "Pass", count: 50 }
+            ];
+            renderPairsList();
+            runAnalysis();
+        });
+
+        document.getElementById("preset-indep").addEventListener("click", () => {
+            datasetRows = [
+                { x: "Linux", f: "Fail", count: 30 },
+                { x: "Linux", f: "Pass", count: 90 },
+                { x: "Windows", f: "Fail", count: 20 },
+                { x: "Windows", f: "Pass", count: 60 }
+            ];
+            renderPairsList();
+            runAnalysis();
+        });
+
+        document.getElementById("clear-pairs-btn").addEventListener("click", () => {
+            datasetRows = [];
+            renderPairsList();
+            document.getElementById("analysis-output").style.display = "none";
+        });
+
+        document.getElementById("run-analysis-btn").addEventListener("click", runAnalysis);
+    </script>
+</html>
