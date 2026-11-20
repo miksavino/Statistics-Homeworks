@@ -1,1 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <title>Homework 7</title>
+        <style>
+            :root {
+                --bg-light-blue: #e8f1f5;
+                --card-bg: #ffffff;
+                --card-border: #d0e0ec;
+                --title: #0f2d59;
+                --text: #1a1a1a;
+                --text-secondary: #4a5568;
+                --button-primary: #0284c7;
+                --other-buttons: #0369a1;
+                --code-bg: #f1f5f9;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 36px 20px;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: var(--bg-light-blue);
+                color: var(--text);
+                line-height: 1.6;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-container {
+                max-width: 980px;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }            
+
+            header {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+
+            header h1 {
+                margin: 0 0 10px 0;
+                font-size: 2.2rem;
+                letter-spacing: -0.02em;
+                color: var(--title);
+                font-weight: 800;
+            }
+
+            .card {
+                background-color: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 12px;
+                padding: 28px 32px;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.06);
+            }
+
+            .card-title {
+                margin: 0 0 16px 0;
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: var(--title);
+                border-bottom: 2px solid #edf2f7;
+                padding-bottom: 10px;
+            }
+
+            .card-content {
+                color: var(--text);
+                font-size: 1rem;
+            }
+
+            .card-content p {
+                margin: 0 0 14px 0; 
+            }
+
+            code {
+                background: var(--code-bg);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                font-size: 0.9em;
+                color: var(--title);
+                border: 1px solid #e2e8f0;
+            }
+
+            .sim-layout {
+                display: grid;
+                grid-template-columns: 420px 1fr;
+                gap: 24px;
+                align-items: start;
+                margin-top: 18px;
+            }
+
+            @media (max-width: 960px) {
+                .sim-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .canvas-box {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            canvas {
+                background-color: #050b18;
+                border: 2px solid #1e293b;
+                border-radius: 8px;
+                width: 100%;
+                max-width: 420px;
+                aspect-ratio: 1 / 1;
+                box-shadow: 0 4px 16px rgba(15, 45, 89, 0.12);
+            }
+
+            .canvas-legend {
+                width: 100%;
+                max-width: 420px;
+                background-color: var(--code-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                padding: 8px 12px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px 12px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.78rem;
+                color: var(--text-secondary);
+            }
+
+            .legend-item strong {
+                color: var(--title);
+                font-family: monospace;
+            }
+
+            .legend-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                border: 1.5px solid #ffffff;
+                flex-shrink: 0;
+            }
+
+            .details-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            /* Riga controlli orizzontale compatta */
+            .calc-grid {
+                display: flex;
+                align-items: flex-end;
+                gap: 8px;
+                width: 100%;
+                flex-wrap: nowrap;
+            }
+
+            .control-group {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+            }
+
+            .control-group label {
+                font-weight: 600;
+                font-size: 0.76rem;
+                color: var(--title);
+                white-space: nowrap;
+            }
+
+            select, input[type="number"] {
+                padding: 4px 6px;
+                font-size: 0.82rem;
+                border: 1px solid var(--card-border);
+                border-radius: 5px;
+                background-color: var(--code-bg);
+                color: var(--text);
+                outline: none;
+                height: 32px;
+            }
+
+            select:focus, input[type="number"]:focus {
+                border-color: var(--button-primary);
+            }
+
+            #selectG {
+                width: 100px;
+            }
+
+            #inputPrivKey {
+                width: 58px;
+            }
+
+            #inputMessage {
+                width: 54px;
+            }
+
+            button {
+                padding: 0 10px;
+                font-size: 0.8rem;
+                font-weight: 700;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.15s ease, opacity 0.15s ease;
+                height: 32px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            button.btn-primary {
+                background-color: var(--button-primary);
+                color: #ffffff;
+            }
+
+            button.btn-primary:hover:not(:disabled) {
+                background-color: var(--other-buttons);
+            }
+
+            button.btn-secondary {
+                background-color: #e2e8f0;
+                color: var(--text);
+            }
+
+            button.btn-secondary:hover:not(:disabled) {
+                background-color: #cbd5e1;
+            }
+
+            .result-summary {
+                background-color: #f0fdf4;
+                border: 1px solid #86efac;
+                color: #14532d;
+                padding: 9px 12px;
+                border-radius: 6px;
+                font-size: 0.88rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+                max-height: 290px;
+                overflow-y: auto;
+                border: 1px solid var(--card-border);
+                border-radius: 6px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-wrapper table tc code {
+                white-space: nowrap;
+                display: inline-block;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.83rem;
+                text-align: left;
+            }
+
+            th {
+                background-color: #f8fafc;
+                color: var(--title);
+                padding: 7px 10px;
+                border-bottom: 2px solid var(--card-border);
+                font-weight: 700;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            td {
+                padding: 7px 10px;
+                border-bottom: 1px solid #edf2f7;
+                color: var(--text);
+            }
+
+            tr:nth-child(even) {
+                background-color: #fafcff;
+            }
+
+            .stat-section {
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #edf2f7;
+            }
+
+            .stat-section:first-of-type {
+                margin-top: 14px;
+                padding-top: 0;
+                border-top: none;
+            }
+
+            .stat-subtitle {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--title);
+                margin: 0 0 12px 0;
+            }
+
+            .stat-text {
+                font-size: 0.95rem;
+                color: var(--text);
+                line-height: 1.6;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header>
+            <h1>Homework 7</h1>
+        </header>
+
+        <div class="main-container">
+            <div class="card">
+                <h2 class="card-title">Modes of Convergence in Probability Theory</h2>
+                <div class="card-content">
+                    <p>
+                        Since random variables are measurable functions mapping outcomes from a probability space into R, a sequence of random variables does not converge in a single deterministic sense: depending on how proximity to a limiting random variable X iss quantified, probability theory defines four primary modes of convergence.
+                        <ol>
+                            <li>
+                                <strong>Convergence in Probability</strong> &rightarrow; The idea of <strong>convergence in probability</strong> is based on the idea that two random variables are "close" if there is a high probability that their difference is arbitrary small. <br/>
+                                Let {X<sub>n</sub>}<sub>n&GreaterEqual;1</sub> be a sequence of random variables defined on a sample space &Omega;, and let X be a random variable defined on the same space. For any strictly positive threshold &epsilon;, X<sub>n</sub> is "far" from X when <code>|X<sub>n</sub> - X| &GreaterEqual; &epsilon;</code>.<br/>
+                                The sequence {X<sub>n</sub>}<sub>n&GreaterEqual;1</sub> converges in probability to X (denoted by <code>X<sub>n</sub> &rightarrow;<sup>p</sup> X</code> or <code>plim<sub>n&rightarrow;&infin;</sub> X<sub>n</sub> = X</code>) if and only if, for every arbitrarily small &epsilon; > 0, it holds that <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$\lim_{n \to \infty} P\left(|X_n - X| \ge \varepsilon\right) = 0$$
+                                </span>. In this case, X is called the <strong>probability limit</strong> of the sequence. <br/><br/>
+                                The most important application of convergence in probability is the <strong>Weak Law of Large Numbers</strong> (<strong>WLLN</strong>): if X<sub>1</sub>, X<sub>2</sub>, ..., X<sub>n</sub> are i.i.d. random variables with finite expected value &mu;, the the sample mean <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$\lim_{n \to \infty} P\left(\|\mathbf{X}_n - \mathbf{X}\| \ge \varepsilon\right) = 0 \qquad \forall \varepsilon > 0$$
+                                </span> converges in probability to &mu;.   
+                            </li>
+                            <br>
+                            <li>
+                                <strong>Almost Sure Convergence</strong> &rightarrow; Each random variable X<sub>n</sub> is a real-valued function defined on a sample space &Omega;. Once a random experiment is performed and an outcome s &in; &Omega; is realized, {X<sub>n</sub>(s)} becomes a deterministic sequence of real numbers. Requiring it to converge to X(s) for every single outcome s &in; &Omega; is restrictive in probability theory: <strong>almost sure convergence</strong> allows divergence on a negligible subset of outcomes E (such that <code>P(E) = 0</code>). <br/>
+                                Formally, a sequence of random variables {X<sub>n</sub>} defined on a sample space &Omega; <strong>converges almost surely</strong> to a random variable X on &Omega; (denoted by X<sub>n</sub> &rightarrow;<sup>a.s.</sup> X) if and only if the set of outcomes for which the sequence converges has probability 1, i.e. <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$P\left(\left\{s \in \Omega : \lim_{n \to \infty} X_n(s) = X(s)\right\}\right) = 1$$
+                                </span>. Equivalently, there is a zero-probability event E such that lim<sub>n&rightarrow;&infin;</sub> X<sub>n</sub>(s) = X(s) for all s &notin; E.<br/>
+                                In this case, X is called <strong>almost sure limit</strong> of the sequence.<br/>
+                                Furthermore, given a real-valued continuous function h, then if X<sub>n</sub> &rightarrow;<sup>a.s.</sup> X, then h(X<sub>n</sub>) &rightarrow;<sup>a.s.</sup> h(X).<br/><br/>
+                                The foundamental application of almost sure convergence is the <strong>Strong Law of Large Numbers</strong> (<strong>SLLN</strong>): if X<sub>1</sub>, X<sub>2</sub>, ..., X<sub>n</sub> are i.i.d. random variables with finite expected value &mu;, then the sample mean converges almost surely to &mu;.<br/>
+                                Unlike the <strong>WLLN</strong>, which only guarantees that the sample mean is close to &mu; at a given large n, the <strong>SLLN</strong> guarantees that with probability 1 that the entire trajectory of sample averages converges permanently to the true population mean &mu;. 
+                            </li>
+                            <br>
+                            <li>
+                                <strong>Mean-Square Convergence</strong> &rightarrow; <strong>Mean-square convergence</strong> relies on the idea that two random variables X<sub>n</sub> and X, defined on the same sample space &Omega;, are similar if the square of their difference (X<sub>n</sub>(&omega;) - X(&omega;))<sup>2</sup> is small on average across all outcomes &omega; &in; &Omega;. Taking the expected value defines a proper distance metric between random variables in the <strong>Hillbert space L<sup>2</sup>(&Omega;)</strong> of <strong>square-integrable functions</strong>.<br/>
+                                More generally, for any fixed r &GreaterEqual; 1, a seuqnce {X<sub>n</sub>} with <code>E[|X<sub>n</sub>|<sup>r</sup>] < &infin;</code> converges in the <strong>r-th mean</strong> (or <strong>L<sup>r</sup> norm</strong>) to X (denoted by X<sub>n</sub> &rightarrow;<sup>L<sup>r</sup></sup> X) if <code>lim<sub>n&rightarrow;&infin;</sub> E[|X<sub>n</sub> - X|<sup>r</sup>] = 0</code>.<br/>
+                                Setting r = 2 yields the <strong>mean-square convergence</strong>. In this case, X is called <strong>mean-squared limit</strong> of the sequence.<br/><br/>
+                                By <strong>Markov's</strong> (or <strong>Chebyshev's</strong>) <strong>inequality</strong>, for any &epsilon; > 0, it holds that <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$P\left(|X_n - X| \ge \varepsilon\right) = P\left((X_n - X)^2 \ge \varepsilon^2\right) \le \frac{\mathbb{E}\left[(X_n - X)^2\right]}{\varepsilon^2} \xrightarrow{n \to \infty} 0$$
+                                </span>, meaning that <strong>mean-square convergence implies convergence in probability</strong>, providing the standard route for proving the WLLN whenever second moments are finite.
+                            </li>
+                            <br>
+                            <li>
+                                <strong>Convergence in Distribution</strong> &rightarrow; <strong>Convergence in distribution</strong> relies on the idea that two random variables are "close" if their probability laws, described by their <strong>CDFs</strong>, are close. It concerns only the global shape of the probability distribution and does not require X<sub>n</sub> and X to have any dependence or even to be defined on the same sample space.<br/>
+                                Formally, a sequence of random variables {X<sub>n</sub>} <strong>converges in distribution</strong> to a random variable X (denoted by X<sub>n</sub> &rightarrow;<sup>d</sup> X or X<sub>n</sub> &rightarrow;<sup>L</sup> X) if and only if <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$\lim_{n \to \infty} F_{X_n}(x) = F_X(x)$$
+                                </span> for every point x &in; R at which F<sub>X(x)</sub> si continuous.<br/>
+                                Requiring convergence only where F<sub>X</sub> is continuous prevents anomalies at jump discontinuities of discrete limit distributions.<br/>
+                                In this case, X is called <strong>limit in distribution</strong> of the sequence.<br/><br/>
+                                The main application of convergence in distribution is the <strong>Central Limit Theorem</strong> (<strong>CLT</strong>): if X<sub>1</sub>, X<sub>2</sub>, ..., X<sub>n</sub> are i.i.d. randon variables with mean &mu; and finite, strictly positive variace &sigma;<sup>2</sup>, the standardized sample mean converges in distribution to a <strong>Standard Normal Distribution</strong>.
+                                In this case, since the random variable converges to a Gaussias bell curve, convergence in distribution allows to approximate sampling distributions, construct confidence intervals, and compute &rho;-values for large samples. 
+                            </li>
+                        </ol>
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Multivariate Generalization</h3>
+                    <p class="stat-text">
+                        All modes of convergence extend naturally from scalar random variables to sequences of random vectors {X<sub>n</sub>} converging to a random vector X.<br/>
+                        For converge modes defined via metric on the sample space (almost sure, mean-square and convergence in probability), the univariate distance |X<sub>n</sub> - X| is replaced by the <strong>Euclidean norm</strong> ||X<sub>n</sub> - X||. 
+                        Moreover, the multivariate convergece is equivalent to the univariate case if and only if each scalar component sequence converges individually, i.e. X<sub>n,1</sub> &rightarrow; X<sub>i</sub> for all i &in; [1, K]. <br/><br/>
+                        In convergence in distribution, the scalar CDFs are replaced by <strong>joint cumulative distribution functions F<sub>X<sub>n</sub></sub>(x)</strong>.<br/>
+                        Unlike the other modes, individual convergence of each entry is necessary but not sufficient for multivariate convergence, because scalar CDFs do not preserve the dependence structure across components.
+                    </p>
+                </div>
+                <div class="stat-section">
+                    <h3 class="stat-subtitle">Role of the term &radic;n</h3>
+                    <p class="stat-text">
+                        The appearance of the term &radic;n across limit theorems, stachastic processes, and statistical inference is a direct consequence of the <strong>additivity of variance under independence</strong>.<br/>
+                        Let X<sub>1</sub>, X<sub>2</sub>, ..., X<sub>n</sub> be a sequence of random variables with common mean <code>&mu; = E[X<sub>i</sub>]</code> and finite variance &sigma;<sup>2</sup>. In general, the variance of their sum <code>S<sub>n</sub> = &sum;<sub>i</sub>X<sub>i</sub></code> includes all pairwise covariance terms, i.e. <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$\text{Var}\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n \text{Var}(X_i) + 2\sum_{1 \le i < j \le n} \text{Cov}(X_i, X_j)$$
+                        </span>.<br/>
+                        When the variables are independent, every covariance vanishes and the variance becomes strictly additive, growing linearly with <em>n</em>.<br/>
+                        To measure dispersion, <strong>standard deviation</strong> is computed by taking the square root of the sum: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                            $$\text{SD}(S_n) = \sqrt{\text{Var}(S_n)} = \sqrt{n\sigma^2} = \sqrt{n}\,\sigma$$
+                        </span>.<br/>
+                        Hence, under independence, the cumulative random fluctuations of a sum grow proportionally to &radic;<em>n</em> rather than <em>n</em>.<br/><br/>
+                        This &radic;n law governs both estimation accuracy and asymptotic normalization: 
+                        <ul>
+                            <li>
+                                When computing the sample mean, dividing the sum by <em>n</em> scales its variance by 1/<em>n</em><sup>2</sup>, i.e. <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$\text{Var}(\bar{X}_n) = \frac{\sigma^2}{n} \implies \text{SE}(\bar{X}_n) = \frac{\sigma}{\sqrt{n}}$$
+                                </span>. In <strong>statistical inference</strong>, this means that estimations uncertainty shrinks at rate O(1/&radic;n).
+                            </li>
+                            <li>
+                                Since <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$\bar{X}_n - \mu$$
+                                </span> shrinks at rate 1/&radic;n, its distribution collapses to a spike at zero in the LLN. To observe a non-degenerate limiting shape of sampling fluctuations in the CLT, we must multiply <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$\bar{X}_n - \mu$$
+                                </span> by &radic;n, i.e. <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                    $$Z_n = \frac{\sqrt{n}(\bar{X}_n - \mu)}{\sigma} \xrightarrow{d} \mathcal{N}(0, 1)$$
+                                </span>. This stabilizes the asymptotic variance at 1. 
+                            </li>
+                            <li>
+                                The same principle appears in the transition from a <strong>discrete Random Walk</strong> to <strong>continuous-time Brownian Motion</strong>. Over <em>n</em> sub-intervals of length <code>dt = 1/n</code>, discrete increments must be scaled by <code>&radic;dt = 1/&radic;n</code>, preserving a finite, non-trivial variance at every instant t.
+                            </li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+            <div class="card">
+                <h2 class="card-title">Conditional Probability, Bayes' Theorem and Statistical Inference</h2>
+                <div class="card-content">
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Bayes' Theorem</h3>
+                        <p class="stat-text">
+                            <strong>Bayes' Theorem</strong> describes how to compute the conditional probability of an event based on prior knowledge and newly observed evidence. Rather than computing forward probabilities from causes to effects, the theorem "inverts" conditional probabilities, allowing to infer the probability of a hidden cause A given an observed outcome B.<br/>
+                            Formally, for any two events A and B defined on a probability space (&Omega; F, P) with P(B) > 0, Bayes' theorem states that <code>P(A|B) = (P(B|A) &middot; P(A))/P(B)</code>.<br/><br/>
+                            By the definition of conditional probability, <code>P(A|B) = P(A &Intersection; B)/P(B)</code> and <code>P(B|A) = P(B &Intersection; A)/P(A)</code>. Solving both expressions and using the commutativity of set intersection (A &Intersection; B = B &Intersection; A) yields the <strong>multiplication rule</strong> <code>P(A|B) &middot; P(B) = P(B|A) &middot; P(A)</code>.<br/>
+                            Dividing both sides by P(B) produces Bayes' formula.<br/><br/>
+                            Each term in Bayes' theorem plays a distinct role in probabilistic reasoning and inference:
+                            <ul>
+                                <li><strong>Prior Probability P(A)</strong> &rightarrow; the initial probability assigned to event A <strong>before</strong> observing any new evidence B.</li>
+                                <li><strong>Likelihood P(B|A)</strong> &rightarrow; the conditional probability of observing the evidence B assuming that A is true.</li>
+                                <li><strong>Marginal Probability</strong> or <strong> Evidence P(B)</strong> &rightarrow; the total probability of observing B across all possible scenarios.</li>
+                                <li><strong>Posterior Probability P(A|B)</strong> &rightarrow; the updated probability of A <strong>after</strong> observing B.</li>
+                            </ul>                            
+                            In many practical applications, the sample space &Omega; is partitioned into <em>n</em> mutually exclusive events A<sub>1</sub>, A<sub>2</sub>, ..., A<sub>n</sub> such that A<sub>i</sub> &Intersection; A<sub>j</sub> for i &NotEqual; j and &Union;<sub>i</sub>A<sub>i</sub> = &Omega;.<br/>
+                            By the <strong>Law of Total Probability</strong>, the probability of any event B can be expanded across all partition elements as <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                $$P(B) = \sum_{j=1}^n P(B \mid A_j)\,P(A_j)$$
+                            </span>.<br/>
+                            Substituting this expansion into the denominator gives the generalized form of Bayes' theorem for any specific event A<sub>i</sub>: <span style="background: var(--code-bg); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.88em; display: inline-block; vertical-align: middle;">
+                                $$P(A_i \mid B) = \frac{P(B \mid A_i)\,P(A_i)}{\sum_{j=1}^n P(B \mid A_j)\,P(A_j)}$$
+                            </span>.
+                        </p>
+                    </div>
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Bayesian Inference</h3>
+                        <p class="stat-text">
+                            In <strong>Bayesian statistical inference</strong>, an observed sample x = (x<sub>1</sub>, ..., x<sub>n</sub>) is treated as the outcome of a random vector X generated by an unknown probability distribution. While in the classical approach the unknown parameter &theta; is a fixed constant, the Bayesian approach treats &theta; as a random variable.<br/>
+                            Hence, statisticians assign a subjective probability distribution to &theta; before seeing the dara, and then use Bayes' rule to update this distribution once the sample x is observed.<br/><br/>
+                            The heart of Bayesian inference can be written as a simple proportionality: <code>Posterior &propto; Likelihood &times; Prior</code> or <code>P(&theta;|D) &propto; P(D|&theta;) &times; P(&theta;)</code>.<br/>
+                            The Posterior Probability is a compromise between what we believed before (P(&theta;)) and what the data tell us now (P(D|&theta;)). If the evidence P(D|&theta;) is very strong, it shifts our belief away from the prior; otherwise, the prior keeps our estimate stable.<br/>
+                            Bayes' rule allows to leanr continuously over time: after collecting a first batch of data D<sub>1</sub>, it is possible to compute the posterior P(&theta;|D<sub>1</sub>). When new data D<sub>2</sub> arrive, that posterior simply becomes the new prior, and the Bayes' theorem is applied again.<br/>
+                            The final result is identical to analyzing all the data together at once.
+                        </p>
+                    </div>
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Example - Medical Diagnostic Testing</h3>
+                        <p class="stat-text">
+                            Consider a medical test for a rare disease: 
+                            <ul>
+                                <li>The <strong>unknown hypothesis &theta;</strong> is whether a patient actually has the disease or is healthty.</li>
+                                <li>The <strong>observed data D</strong> is the patient receiving a positive test result.</li>
+                            </ul>
+                            Assuming that the disease afftcts 1% of the population, the <strong>prior probabilities</strong> are: <code>P(Disease) = 0.01</code> and <code>P(Healthy) = 0.99</code>.<br/>
+                            Assuming that the test is 95% accurate, the <strong>likelihood probabilities</strong> are: <code>P(+|Disease) = 0.95</code> and <code>P(+|Healthy) = 0.05</code><br/><br/>
+                            By using the Law of Total Probability, we find the total probability of getting a positive test: <code>P(+) = P(+|Disease)P(Disease) + P(+|Healthy)P(Healthy) = (0.95 &middot; 0.99) + (0.05 &middot; 0.99) = 0.059</code>.<br/>
+                            Now we apply Bayes' theorem to find the posterior probability that the patient actually has the disease: <code>P(Disease|+) = P(+) &middot; P(Disease)/TotP(+) = 0.161 (16.1%)</code>.<br/><br/>
+                            Even though the test has a high likelihood, the posterior probability is only 16.1% since the prior probability of having the disease was very low. However, if the patient takes a second independent test and gets another positive result, 16.1% becomes the new prior, and the posterior probability jumps to 78.4%.
+
+                        </p>
+                    </div>
+                    <div class="stat-section">
+                        <h3 class="stat-subtitle">Applications, Advantages, Limitations, and Impact on Statistical Conclusions</h3>
+                        <p class="stat-text">
+                            Bayesian inference is widely used whenever decisions must be made under uncertainty and new data arrive continuously:
+                            <ul>
+                                <li><strong>Medical Diagnosis and Clinical Trials</strong> &rightarrow; updating the probability that a patient has a disease after diagnostic tests, or combining historical trial data with new patient results to evaluate treatments faster.</li>
+                                <li><strong>Spam Filtering and Cybersecurity</strong> &rightarrow; classifying emails as spam or detecting network intrusions by updating baseline threats probabilities as new message features or traffic pattern appear.</li>
+                                <li><strong>Finance</strong> &rightarrow; estimating conversion rates in online experiments, forecasting financial risk, and updating demand predictions in real time.</li>
+                                <li><strong>Machine Learning and AI</strong> &rightarrow; adapting to users behaviour over time.</li>
+                            </ul>
+                            <br/>
+                            The key advantages are:
+                            <ul>
+                                <li>Unlike classical confidence intervals, <strong>Bayesian credible intervals</strong> allow direct probability statements about unknown parameters.</li>
+                                <li>When historical data already exist, the prior allows to include that information formally instead of starting from scratch.</li>
+                                <li>When sample sizes are small and data are noisy, a prior acts as a stabilizer, preventing extreme or unrealistic estimates.</li>
+                                <li>New data can be added step by step without re-analyzing old datasets from the beginning.</li>
+                            </ul>
+                            <br/>
+                            However, Bayesian inference has the following main limitations:
+                            <ul>
+                                <li>Different analysts may choose different prior probabilities, which can lead to different conclusions when data are scarce.</li>
+                                <li>Calculating the normalizing denominator P(D) often requires complex integrals that cannot be solved by hand, forcing analysts to rely on computer simulations.</li>
+                                <li>If an analyst chooses a strong or inaccurate prior, the model may require a huge amount of data to correct the initial bias.</li>
+                            </ul>
+                            <br/>
+                            The balance between the prior and the likelihood directly shapes the final conclusions: 
+                            <ul>
+                                <li>When the sample size is small, the likelihood function is relatively flat, so the prior has strong influence on the posterior.</li>
+                                <li>When the sample size is large, as more data are collected, the likelihood becomes concentrated around the true parameter value and dominates the prior. Hence, Bayesian estimates converge to the same result as classical methods.</li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="card">
+                <h2 class="card-title">References</h2>
+                <div class="card-content">
+                    <ol style="padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.93rem; color: var(--text);">
+                        <li>Pishro-Nik, H. (2014). <em>Introduction to Probability, Statistics, and Random Processes</em> (Chapter 7: Limit Theorems and Convergence of Random Variables). Kappa Research, LLC. <a href="https://www.probabilitycourse.com/chapter7" target="_blank" rel="noopener">https://www.probabilitycourse.com/chapter7</a></li>
+                        <li>Taboga, M. (2021). <em>Asymptotic Theory</em>. Lectures on Probability Theory and Mathematical Statistics (Kindle Direct Publishing, Online Appendix). <a href="https://www.statlect.com/asymptotic-theory/" target="_blank" rel="noopener">https://www.statlect.com/asymptotic-theory/</a></li>
+                        <li>GeeksforGeeks. <em>Bayes' Theorem</em>. <a href="https://www.geeksforgeeks.org/maths/bayes-theorem/" target="_blank" rel="noopener">https://www.geeksforgeeks.org/maths/bayes-theorem/</a></li>
+                        <li>Taboga, M. (2021). <em>Bayesian Inference</em>. Lectures on Probability Theory and Mathematical Statistics (Kindle Direct Publishing, Online Appendix). <a href="https://www.statlect.com/fundamentals-of-statistics/Bayesian-inference" target="_blank" rel="noopener">https://www.statlect.com/fundamentals-of-statistics/Bayesian-inference</a></li>
+                    </ol>
+                </div>
+            </section>
+        </div>       
+    </body>
+</html>
