@@ -141,7 +141,7 @@
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Key Generation vs. Key Derivation</h3>
                         <p class="stat-text">
-                             <strong>key generation</strong> is defined as the generation of a cryptographic key either as a single process 
+                             <strong>Key generation</strong> is defined as the generation of a cryptographic key either as a single process 
 using a random bit generator and an approved set of rules, or 
 as created during key agreement or key derivation. It represents the first stage of the cryptographic key lifecycle, establishing the security baseline on which all operations rely.   
                         </p>
@@ -161,7 +161,7 @@ as created during key agreement or key derivation. It represents the first stage
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Hashing</h3>
                         <p class="stat-text">
-                            <strong>Hashing</strong> is the process of converting data - text, numbers, files, or anything - into a fixed.length string of letters and numbers by using an algorithm called <strong>hash function</strong>.
+                            <strong>Hashing</strong> is the process of converting data - text, numbers, files, or anything - into a fixed length string of letters and numbers by using an algorithm called <strong>hash function</strong>.
                         </p>
                         <p class="stat-text">
                             Hashing and encryption are both ways of transforming data:
@@ -183,7 +183,7 @@ as created during key agreement or key derivation. It represents the first stage
                     <div class="stat-section">
                         <h3 class="stat-subtitle">Encoding</h3>
                         <p class="stat-text">
-                            <strong>Encoding</strong> is a reversible way of changing data into another representation, so it can be transported, stored or interpreted by another system..<br/>
+                            <strong>Encoding</strong> is a reversible way of changing data into another representation, so it can be transported, stored or interpreted by another system.<br/>
                             It is not a protection mechanism, but is about representation: an encoded value may look unreadable, but it is still the original data once decoded.<br/> 
                         </p>
                     </div>
@@ -315,7 +315,7 @@ as created during key agreement or key derivation. It represents the first stage
                     <div class="stat-section">
                         <h3 class="stat-subtitle">secp256k1 (Elliptic-Curve Public-Key Cryptography)</h3>
                         <p class="stat-text">
-                            <strong>secp256k1</strong> is the elliptic curve cryptography standard used to generate private keys and create digital signaratures, allowing users to prove fund ownership without revealing their private keys.<br/>
+                            <strong>secp256k1</strong> is the elliptic curve cryptography standard used to generate public keys and create digital signaratures, allowing users to prove fund ownership without revealing their private keys.<br/>
                             The standard transforms a private key into a public key through elliptic curve multiplication: it multiplies the 256-bit private key scalar <code>k</code> by a predefined generator point <code>G</code> on the curve (<code>Q = kG</code>); the result is a 64-byte public key.
                             <br/>secp256k1 offers strong cryptographic security, efficient computation, relatively small key size, fast verification and low overhead.
                         </p>
@@ -334,7 +334,7 @@ as created during key agreement or key derivation. It represents the first stage
                             <br/>The hash function works using a two-phase sponge construction:
                         </p>
                         <ul>
-                            <li>During the <strong>absorbing phase</strong>, pads and partitions input data into blocks, XORs them into a 1600-bit internal state and scrambles the state via the <strong>Kekkak-f permutation</strong>.</li>
+                            <li>During the <strong>absorbing phase</strong>, it splits input data into blocks, XORs them into a 1600-bit internal state and scrambles the state via the <strong>Kekkak-f permutation</strong>.</li>
                             <li>During the <strong>squeezing phase</strong>, extracts 256 bits from the internal state to produce the final hash.</li>
                         </ul>
                         <p class="stat-text">In order to generate Ethereum addresses, the function keeps the last 20 bytes of the result.</p>
